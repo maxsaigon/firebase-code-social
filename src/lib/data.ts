@@ -2,25 +2,25 @@ import type { User, Service, Order, Transaction } from '@/types';
 
 // Mock Data
 const users: User[] = [
-  { id: 'usr_1', created_at: '2023-10-26T10:00:00Z', full_name: 'Alice Johnson', email: 'alice@example.com', is_admin: true, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=alice' },
-  { id: 'usr_2', created_at: '2023-10-25T11:30:00Z', full_name: 'Bob Williams', email: 'bob@example.com', is_admin: false, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=bob' },
-  { id: 'usr_3', created_at: '2023-10-24T09:00:00Z', full_name: 'Charlie Brown', email: 'charlie@example.com', is_admin: false, status: 'inactive', avatar_url: 'https://i.pravatar.cc/150?u=charlie' },
-  { id: 'usr_4', created_at: '2023-10-23T14:20:00Z', full_name: 'Diana Prince', email: 'diana@example.com', is_admin: false, status: 'suspended', avatar_url: 'https://i.pravatar.cc/150?u=diana' },
-  { id: 'usr_5', created_at: '2023-10-22T18:00:00Z', full_name: 'Ethan Hunt', email: 'ethan@example.com', is_admin: false, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=ethan' },
+  { id: 'usr_1', created_at: '2023-10-26T10:00:00Z', updated_at: '2023-10-26T10:00:00Z', full_name: 'Alice Johnson', email: 'alice@example.com', is_admin: true, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=alice' },
+  { id: 'usr_2', created_at: '2023-10-25T11:30:00Z', updated_at: '2023-10-25T11:30:00Z', full_name: 'Bob Williams', email: 'bob@example.com', is_admin: false, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=bob' },
+  { id: 'usr_3', created_at: '2023-10-24T09:00:00Z', updated_at: '2023-10-24T09:00:00Z', full_name: 'Charlie Brown', email: 'charlie@example.com', is_admin: false, status: 'inactive', avatar_url: 'https://i.pravatar.cc/150?u=charlie' },
+  { id: 'usr_4', created_at: '2023-10-23T14:20:00Z', updated_at: '2023-10-23T14:20:00Z', full_name: 'Diana Prince', email: 'diana@example.com', is_admin: false, status: 'suspended', avatar_url: 'https://i.pravatar.cc/150?u=diana' },
+  { id: 'usr_5', created_at: '2023-10-22T18:00:00Z', updated_at: '2023-10-22T18:00:00Z', full_name: 'Ethan Hunt', email: 'ethan@example.com', is_admin: false, status: 'active', avatar_url: 'https://i.pravatar.cc/150?u=ethan' },
 ];
 
 const services: Service[] = [
-  { id: 'srv_1', created_at: '2023-01-15T10:00:00Z', name: 'Graphic Design', description: 'Professional graphic design services for branding and marketing materials.', price: 150, category: 'Design', is_active: true, image_url: `https://placehold.co/600x400.png` },
-  { id: 'srv_2', created_at: '2023-02-20T14:30:00Z', name: 'Web Development', description: 'Custom website development with modern technologies.', price: 1200, category: 'Tech', is_active: true, image_url: `https://placehold.co/600x400.png` },
-  { id: 'srv_3', created_at: '2023-03-10T09:00:00Z', name: 'Content Writing', description: 'High-quality content for blogs, websites, and social media.', price: 80, category: 'Writing', is_active: false, image_url: `https://placehold.co/600x400.png` },
-  { id: 'srv_4', created_at: '2023-04-05T18:00:00Z', name: 'SEO Optimization', description: 'Improve your search engine rankings and drive organic traffic.', price: 300, category: 'Marketing', is_active: true, image_url: `https://placehold.co/600x400.png` },
+  { id: 'srv_1', created_at: '2023-01-15T10:00:00Z', updated_at: '2023-01-15T10:00:00Z', name: 'Graphic Design', description: 'Professional graphic design services for branding and marketing materials.', price: 150, category: 'Design', is_active: true },
+  { id: 'srv_2', created_at: '2023-02-20T14:30:00Z', updated_at: '2023-02-20T14:30:00Z', name: 'Web Development', description: 'Custom website development with modern technologies.', price: 1200, category: 'Tech', is_active: true },
+  { id: 'srv_3', created_at: '2023-03-10T09:00:00Z', updated_at: '2023-03-10T09:00:00Z', name: 'Content Writing', description: 'High-quality content for blogs, websites, and social media.', price: 80, category: 'Writing', is_active: false },
+  { id: 'srv_4', created_at: '2023-04-05T18:00:00Z', updated_at: '2023-04-05T18:00:00Z', name: 'SEO Optimization', description: 'Improve your search engine rankings and drive organic traffic.', price: 300, category: 'Marketing', is_active: true },
 ];
 
 const orders: Order[] = [
-  { id: 'ord_1', created_at: '2023-10-26T12:00:00Z', user_id: 'usr_2', service_id: 'srv_1', quantity: 1, unit_price: 150, total_amount: 150, status: 'completed' },
-  { id: 'ord_2', created_at: '2023-10-25T15:00:00Z', user_id: 'usr_3', service_id: 'srv_2', quantity: 1, unit_price: 1200, total_amount: 1200, status: 'processing' },
-  { id: 'ord_3', created_at: '2023-10-24T10:00:00Z', user_id: 'usr_4', service_id: 'srv_4', quantity: 2, unit_price: 300, total_amount: 600, status: 'pending' },
-  { id: 'ord_4', created_at: '2023-10-23T11:00:00Z', user_id: 'usr_5', service_id: 'srv_1', quantity: 1, unit_price: 150, total_amount: 150, status: 'cancelled' },
+  { id: 'ord_1', created_at: '2023-10-26T12:00:00Z', updated_at: '2023-10-26T12:00:00Z', user_id: 'usr_2', service_id: 'srv_1', quantity: 1, unit_price: 150, total_amount: 150, status: 'completed' },
+  { id: 'ord_2', created_at: '2023-10-25T15:00:00Z', updated_at: '2023-10-25T15:00:00Z', user_id: 'usr_3', service_id: 'srv_2', quantity: 1, unit_price: 1200, total_amount: 1200, status: 'processing' },
+  { id: 'ord_3', created_at: '2023-10-24T10:00:00Z', updated_at: '2023-10-24T10:00:00Z', user_id: 'usr_4', service_id: 'srv_4', quantity: 2, unit_price: 300, total_amount: 600, status: 'pending' },
+  { id: 'ord_4', created_at: '2023-10-23T11:00:00Z', updated_at: '2023-10-23T11:00:00Z', user_id: 'usr_5', service_id: 'srv_1', quantity: 1, unit_price: 150, total_amount: 150, status: 'cancelled' },
 ];
 
 const transactions: Transaction[] = [
@@ -49,10 +49,10 @@ export const getTransactions = async () => {
 
 export const getDashboardStats = async () => {
   return Promise.resolve({
-    newUsers30d: 12,
-    activeServices: services.filter(s => s.is_active).length,
-    pendingOrders: orders.filter(o => o.status === 'pending').length,
-    revenue30d: 1850,
+    new_users_30d: 12,
+    active_services: services.filter(s => s.is_active).length,
+    pending_orders: orders.filter(o => o.status === 'pending').length,
+    revenue_30d: 1850,
   });
 };
 

@@ -2,74 +2,85 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ShoppingCart,
-  ArrowLeftRight,
-  LifeBuoy,
-  LogOut,
-  Cog,
-} from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Icons } from '@/components/shared/icons';
+import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, Sparkles } from 'lucide-react';
 
-const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/users', icon: Users, label: 'Users' },
-  { href: '/services', icon: Package, label: 'Services' },
-  { href: '/orders', icon: ShoppingCart, label: 'Orders' },
-  { href: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
-];
+interface SidebarItemProps {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  isActive: boolean;
+}
 
-const secondaryNavItems = [
-    { href: '/settings', icon: Cog, label: 'Settings' },
-    { href: '/support', icon: LifeBuoy, label: 'Support' },
-]
+const SidebarItem = ({ icon: Icon, label, href, isActive }: SidebarItemProps) => (
+  <Link
+    href={href}
+    className={cn(
+      "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+      isActive
+        ? "bg-gray-900 text-white"
+        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+    )}
+  >
+    <Icon className="w-5 h-5" />
+    <span>{label}</span>
+  </Link>
+);
 
-export function AdminSidebar() {
+const AdminSidebar = () => {
   const pathname = usePathname();
 
+  const navItems = [
+    {
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      href: "/admin/dashboard",
+    },
+    {
+      icon: Users,
+      label: "Users",
+      href: "/admin/users",
+    },
+    {
+      icon: Package,
+      label: "Services",
+      href: "/admin/services",
+    },
+    {
+      icon: ShoppingCart,
+      label: "Orders",
+      href: "/admin/orders",
+    },
+    {
+      icon: DollarSign,
+      label: "Transactions",
+      href: "/admin/transactions",
+    },
+    {
+      icon: Sparkles,
+      label: "AI Tools",
+      href: "/admin/ai-tools",
+    },
+  ];
+
   return (
-    <div className="flex h-full flex-col border-r">
-      <div className="flex h-16 items-center border-b px-6 shrink-0">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <Icons.logo className="h-6 w-6 text-primary" />
-          <span className="">Service Central</span>
-        </Link>
+    <div className="flex flex-col h-full px-3 py-4 overflow-y-auto bg-white border-r">
+      <div className="flex items-center justify-center mb-6">
+        <h2 className="text-xl font-bold text-gray-900">Service Central</h2>
       </div>
-      <div className="flex-1 overflow-y-auto">
-        <nav className="flex flex-col gap-1 p-4">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={pathname === item.href ? 'default' : 'ghost'}
-                className="w-full justify-start"
-              >
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.label}
-              </Button>
-            </Link>
-          ))}
-        </nav>
-      </div>
-      <div className="mt-auto flex flex-col gap-1 p-4">
-        {secondaryNavItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start">
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.label}
-                </Button>
-            </Link>
+      <nav className="flex-1 space-y-1">
+        {navItems.map((item) => (
+          <SidebarItem
+            key={item.href}
+            icon={item.icon}
+            label={item.label}
+            href={item.href}
+            isActive={pathname === item.href}
+          />
         ))}
-        <Button variant="ghost" className="w-full justify-start">
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
-      </div>
+      </nav>
     </div>
   );
-}
+};
+
+export default AdminSidebar;

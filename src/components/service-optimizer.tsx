@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { Lightbulb, Sparkles } from 'lucide-react';
 
 const initialState = {
-  message: null,
+  message: '',
   errors: null,
   data: null,
 };

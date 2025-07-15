@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthProvider';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,9 +24,18 @@ import { Button } from '@/components/ui/button';
 import { Search, Package2 } from 'lucide-react';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { AdminSidebar } from './AdminSidebar';
+import AdminSidebar from './AdminSidebar';
+import { useAuth } from '@/contexts/AuthProvider';
+import { useRouter } from 'next/navigation';
 
 export function Header() {
+  const { signOut } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/auth/login');
+  };
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Sheet>
@@ -80,7 +93,7 @@ export function Header() {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

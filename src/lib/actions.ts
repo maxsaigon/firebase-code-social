@@ -1,15 +1,25 @@
-'use server';
-
-import { optimizeServiceDescription as optimize } from '@/ai/flows/service-description-optimizer';
-import type { OptimizeServiceDescriptionInput } from '@/ai/flows/service-description-optimizer';
 import { z } from 'zod';
 
-const schema = z.object({
-  description: z.string().min(10, { message: 'Description must be at least 10 characters long.' }),
+const optimizeSchema = z.object({
+  description: z.string().min(10, 'Description must be at least 10 characters.'),
 });
 
-export async function optimizeServiceDescription(prevState: any, formData: FormData) {
-  const validatedFields = schema.safeParse({
+interface OptimizationResult {
+  optimizedDescription: string;
+  explanation: string;
+}
+
+interface ActionState {
+  message: string | null;
+  errors: { description?: string[] } | null;
+  data: OptimizationResult | null;
+}
+
+export async function optimizeServiceDescription(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const validatedFields = optimizeSchema.safeParse({
     description: formData.get('description'),
   });
 
@@ -21,18 +31,22 @@ export async function optimizeServiceDescription(prevState: any, formData: FormD
     };
   }
 
+  const { description } = validatedFields.data;
+
   try {
-    const result = await optimize({ description: validatedFields.data.description });
+    // Simulate AI optimization
+    const optimizedDescription = `Optimized: ${description.toUpperCase()}`;
+    const explanation = `This description was optimized by converting it to uppercase. In a real scenario, an AI model would provide a more sophisticated optimization and explanation.`;
+
     return {
-      message: 'Success',
+      message: 'Optimization successful',
       errors: null,
-      data: result,
+      data: { optimizedDescription, explanation },
     };
   } catch (error) {
-    console.error(error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error('Optimization error:', error);
     return {
-      message: `An unexpected error occurred: ${errorMessage}`,
+      message: 'An unexpected error occurred during optimization.',
       errors: null,
       data: null,
     };
