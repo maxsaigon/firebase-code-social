@@ -2,14 +2,19 @@ import { supabase } from '@/lib/supabaseClient';
 import type { Wallet, Transaction } from '@/types';
 
 export const addFundApi = {
-  async getWallet(userId: string): Promise<Wallet> {
+  async getWallet(userId: string): Promise<Wallet | null> {
     const { data, error } = await supabase
       .from('wallets')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') { // No rows found
+        return null;
+      }
+      throw error;
+    }
     return data;
   },
 

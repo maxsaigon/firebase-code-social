@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, Sparkles, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthProvider';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -29,6 +32,13 @@ const SidebarItem = ({ icon: Icon, label, href, isActive }: SidebarItemProps) =>
 
 const AdminSidebar = () => {
   const pathname = usePathname();
+  const { signOut } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/auth/login');
+  };
 
   const navItems = [
     {
@@ -79,6 +89,16 @@ const AdminSidebar = () => {
           />
         ))}
       </nav>
+      <div className="mt-auto pt-4">
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className="w-full justify-start text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        >
+          <LogOut className="w-5 h-5 mr-3" />
+          Logout
+        </Button>
+      </div>
     </div>
   );
 };

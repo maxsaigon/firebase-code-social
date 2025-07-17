@@ -1,88 +1,224 @@
 -- =============================================
--- Admin Service Hub - Supabase Sample Data
+-- Admin Service Hub - PostgreSQL Sample Data
 -- =============================================
 
--- 1. INSERT USERS (after auth.users are created)
-INSERT INTO public.users (id, email, full_name, is_admin, status, created_at) VALUES
+-- 1. INSERT USERS (with hashed passwords)
+-- All passwords are 'password123'
+INSERT INTO users (id, email, full_name, password, is_admin, status, created_at, updated_at) VALUES
 -- Admin user
-('5e6c742e-2d13-4fb7-940c-4a05ed755ec0', 'admin@demo.com', 'System Administrator', true, 'active', '2024-01-01 10:00:00+00'),
+(gen_random_uuid(), 'admin@demo.com', 'System Administrator', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', true, 'ACTIVE', NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'),
+
 -- Regular users
-('64e4638e-0f83-4a07-83ff-becbf9d4bc00', 'john.doe@gmail.com', 'John Doe', false, 'active', '2024-01-05 11:30:00+00'),
-('d9b74981-785c-43c0-b432-1fa2d579d27d', 'jane.smith@gmail.com', 'Jane Smith', false, 'active', '2024-01-10 14:00:00+00'),
-('262e2433-b9dc-4303-8ed4-aac304e9260e', 'mike.wilson@gmail.com', 'Mike Wilson', false, 'inactive', '2024-01-15 09:00:00+00');
+(gen_random_uuid(), 'john.doe@gmail.com', 'John Doe', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', false, 'ACTIVE', NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'),
 
--- 2. INSERT SERVICES
-INSERT INTO public.services (id, name, description, price, is_active, category, created_at) VALUES
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 'Social Media Boost', 'Increase your social media followers and engagement', 9.99, true, 'social-media', '2024-01-02 09:00:00+00'),
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 'Website Traffic Package', 'Drive targeted traffic to your website', 29.99, true, 'traffic', '2024-01-03 10:00:00+00'),
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a03', 'SEO Optimization', 'Improve your website search engine ranking', 79.99, true, 'seo', '2024-01-04 11:00:00+00'),
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a04', 'Content Writing', 'Professional content writing services', 49.99, true, 'content', '2024-01-06 13:00:00+00'),
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a05', 'Logo Design', 'Custom logo design for your brand', 99.99, false, 'design', '2024-01-07 14:00:00+00');
+(gen_random_uuid(), 'jane.smith@gmail.com', 'Jane Smith', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', false, 'ACTIVE', NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
 
--- 3. INSERT ORDERS
-INSERT INTO public.orders (id, user_id, service_id, quantity, unit_price, total_amount, status, created_at) VALUES
--- John's orders
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b01', '64e4638e-0f83-4a07-83ff-becbf9d4bc00', 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 2, 9.99, 19.98, 'completed', '2024-01-07 10:00:00+00'),
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b02', '64e4638e-0f83-4a07-83ff-becbf9d4bc00', 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 1, 29.99, 29.99, 'processing', '2024-01-08 14:00:00+00'),
--- Jane's orders
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b03', 'd9b74981-785c-43c0-b432-1fa2d579d27d', 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a03', 1, 79.99, 79.99, 'completed', '2024-01-12 09:00:00+00'),
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b04', 'd9b74981-785c-43c0-b432-1fa2d579d27d', 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a04', 2, 49.99, 99.98, 'cancelled', '2024-01-15 11:00:00+00'),
--- Mike's orders
-('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b05', '262e2433-b9dc-4303-8ed4-aac304e9260e', 'a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 1, 9.99, 9.99, 'pending', '2024-01-18 16:00:00+00');
+(gen_random_uuid(), 'mike.wilson@gmail.com', 'Mike Wilson', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', false, 'INACTIVE', NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days'),
 
--- 4. INSERT TRANSACTIONS (will automatically update wallet balance)
-INSERT INTO public.transactions (id, user_id, order_id, amount, type, status, description, created_at) VALUES
--- John's transactions
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', '64e4638e-0f83-4a07-83ff-becbf9d4bc00', NULL, 100.00, 'deposit', 'completed', 'Wallet top-up via PayPal', '2024-01-06 10:00:00+00'),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', '64e4638e-0f83-4a07-83ff-becbf9d4bc00', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b01', -19.98, 'payment', 'completed', 'Payment for Social Media Boost x2', '2024-01-07 10:01:00+00'),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', '64e4638e-0f83-4a07-83ff-becbf9d4bc00', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b02', -29.99, 'payment', 'completed', 'Payment for Website Traffic Package', '2024-01-08 14:01:00+00'),
+(gen_random_uuid(), 'sarah.johnson@outlook.com', 'Sarah Johnson', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', false, 'ACTIVE', NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
 
--- Jane's transactions
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c04', 'd9b74981-785c-43c0-b432-1fa2d579d27d', NULL, 200.00, 'deposit', 'completed', 'Wallet top-up via Credit Card', '2024-01-11 11:00:00+00'),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05', 'd9b74981-785c-43c0-b432-1fa2d579d27d', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b03', -79.99, 'payment', 'completed', 'Payment for SEO Optimization', '2024-01-12 09:01:00+00'),
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c06', 'd9b74981-785c-43c0-b432-1fa2d579d27d', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b04', 99.98, 'refund', 'completed', 'Refund for cancelled Content Writing order', '2024-01-15 11:15:00+00'),
+(gen_random_uuid(), 'david.brown@yahoo.com', 'David Brown', '$2b$12$LQv3c1yqBwlVHpPjrCpCQu3/5ejzSUIMHX/HCDz8nw.CzVS.9W7Cy', false, 'ACTIVE', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days');
 
--- Mike's transactions
-('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380c07', '262e2433-b9dc-4303-8ed4-aac304e9260e', NULL, 50.00, 'deposit', 'completed', 'Wallet top-up via Bank Transfer', '2024-01-17 15:00:00+00');
+-- 2. CREATE WALLETS for all users (using variables for better readability)
+DO $$
+DECLARE
+    admin_user_id UUID;
+    john_user_id UUID;
+    jane_user_id UUID;
+    mike_user_id UUID;
+    sarah_user_id UUID;
+    david_user_id UUID;
+BEGIN
+    -- Get user IDs
+    SELECT id INTO admin_user_id FROM users WHERE email = 'admin@demo.com';
+    SELECT id INTO john_user_id FROM users WHERE email = 'john.doe@gmail.com';
+    SELECT id INTO jane_user_id FROM users WHERE email = 'jane.smith@gmail.com';
+    SELECT id INTO mike_user_id FROM users WHERE email = 'mike.wilson@gmail.com';
+    SELECT id INTO sarah_user_id FROM users WHERE email = 'sarah.johnson@outlook.com';
+    SELECT id INTO david_user_id FROM users WHERE email = 'david.brown@yahoo.com';
 
--- 5. CHECK WALLET BALANCE RESULTS (after inserting transactions)
-/*
-Expected wallet balances:
-- John (64e4638e...): 100.00 - 19.98 - 29.99 = 50.03
-- Jane (d9b74981...): 200.00 - 79.99 + 99.98 = 219.99
-- Mike (262e2433...): 50.00 = 50.00
-*/
+    -- Insert wallets
+    INSERT INTO wallets (id, user_id, balance, created_at, updated_at) VALUES
+    (gen_random_uuid(), admin_user_id, 1000.00, NOW() - INTERVAL '30 days', NOW()),
+    (gen_random_uuid(), john_user_id, 150.50, NOW() - INTERVAL '25 days', NOW()),
+    (gen_random_uuid(), jane_user_id, 275.25, NOW() - INTERVAL '20 days', NOW()),
+    (gen_random_uuid(), mike_user_id, 50.00, NOW() - INTERVAL '15 days', NOW()),
+    (gen_random_uuid(), sarah_user_id, 89.99, NOW() - INTERVAL '10 days', NOW()),
+    (gen_random_uuid(), david_user_id, 200.00, NOW() - INTERVAL '5 days', NOW());
+END $$;
 
--- DATA VERIFICATION QUERIES
--- ======================
+-- 3. INSERT SERVICES
+INSERT INTO services (id, name, description, price, is_active, category, created_at, updated_at) VALUES
+-- Social Media Services
+(gen_random_uuid(), 'Instagram Followers Boost', 'Get 1000+ high-quality Instagram followers to boost your social presence', 19.99, true, 'social-media', NOW() - INTERVAL '29 days', NOW() - INTERVAL '29 days'),
 
--- Check wallet balance
-SELECT
+(gen_random_uuid(), 'TikTok Views Package', 'Increase your TikTok video views and engagement rate', 14.99, true, 'social-media', NOW() - INTERVAL '28 days', NOW() - INTERVAL '28 days'),
+
+(gen_random_uuid(), 'YouTube Subscribers', 'Grow your YouTube channel with real subscribers', 39.99, true, 'social-media', NOW() - INTERVAL '27 days', NOW() - INTERVAL '27 days'),
+
+-- Digital Marketing Services
+(gen_random_uuid(), 'Website Traffic Boost', 'Drive targeted traffic to your website with our premium package', 29.99, true, 'marketing', NOW() - INTERVAL '26 days', NOW() - INTERVAL '26 days'),
+
+(gen_random_uuid(), 'SEO Optimization Package', 'Complete SEO audit and optimization for better search rankings', 79.99, true, 'marketing', NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'),
+
+(gen_random_uuid(), 'Google Ads Setup', 'Professional Google Ads campaign setup and management', 149.99, true, 'marketing', NOW() - INTERVAL '24 days', NOW() - INTERVAL '24 days'),
+
+-- Content Services
+(gen_random_uuid(), 'Professional Logo Design', 'Custom logo design with unlimited revisions', 99.99, true, 'design', NOW() - INTERVAL '23 days', NOW() - INTERVAL '23 days'),
+
+(gen_random_uuid(), 'Content Writing Service', 'High-quality articles and blog posts for your business', 49.99, true, 'content', NOW() - INTERVAL '22 days', NOW() - INTERVAL '22 days'),
+
+(gen_random_uuid(), 'Video Editing Service', 'Professional video editing for social media and marketing', 89.99, true, 'content', NOW() - INTERVAL '21 days', NOW() - INTERVAL '21 days'),
+
+-- Development Services
+(gen_random_uuid(), 'Landing Page Creation', 'Responsive landing page design and development', 199.99, true, 'development', NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
+
+(gen_random_uuid(), 'Mobile App Consultation', 'Expert consultation for mobile app development strategy', 299.99, false, 'development', NOW() - INTERVAL '19 days', NOW() - INTERVAL '19 days'),
+
+(gen_random_uuid(), 'WordPress Setup', 'Complete WordPress website setup with theme customization', 159.99, true, 'development', NOW() - INTERVAL '18 days', NOW() - INTERVAL '18 days');
+
+-- 4. INSERT ORDERS WITH REALISTIC DATA
+DO $$
+DECLARE
+    john_user_id UUID;
+    jane_user_id UUID;
+    sarah_user_id UUID;
+    david_user_id UUID;
+    
+    instagram_service_id UUID;
+    tiktok_service_id UUID;
+    traffic_service_id UUID;
+    seo_service_id UUID;
+    logo_service_id UUID;
+    content_service_id UUID;
+    landing_service_id UUID;
+BEGIN
+    -- Get user IDs
+    SELECT id INTO john_user_id FROM users WHERE email = 'john.doe@gmail.com';
+    SELECT id INTO jane_user_id FROM users WHERE email = 'jane.smith@gmail.com';
+    SELECT id INTO sarah_user_id FROM users WHERE email = 'sarah.johnson@outlook.com';
+    SELECT id INTO david_user_id FROM users WHERE email = 'david.brown@yahoo.com';
+    
+    -- Get service IDs
+    SELECT id INTO instagram_service_id FROM services WHERE name = 'Instagram Followers Boost';
+    SELECT id INTO tiktok_service_id FROM services WHERE name = 'TikTok Views Package';
+    SELECT id INTO traffic_service_id FROM services WHERE name = 'Website Traffic Boost';
+    SELECT id INTO seo_service_id FROM services WHERE name = 'SEO Optimization Package';
+    SELECT id INTO logo_service_id FROM services WHERE name = 'Professional Logo Design';
+    SELECT id INTO content_service_id FROM services WHERE name = 'Content Writing Service';
+    SELECT id INTO landing_service_id FROM services WHERE name = 'Landing Page Creation';
+
+    -- Insert orders
+    INSERT INTO orders (id, user_id, service_id, quantity, unit_price, total_amount, status, created_at, updated_at) VALUES
+    -- John's orders
+    (gen_random_uuid(), john_user_id, instagram_service_id, 2, 19.99, 39.98, 'COMPLETED', NOW() - INTERVAL '20 days', NOW() - INTERVAL '18 days'),
+    (gen_random_uuid(), john_user_id, traffic_service_id, 1, 29.99, 29.99, 'PROCESSING', NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days'),
+    (gen_random_uuid(), john_user_id, tiktok_service_id, 1, 14.99, 14.99, 'PENDING', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days'),
+
+    -- Jane's orders
+    (gen_random_uuid(), jane_user_id, seo_service_id, 1, 79.99, 79.99, 'COMPLETED', NOW() - INTERVAL '18 days', NOW() - INTERVAL '16 days'),
+    (gen_random_uuid(), jane_user_id, logo_service_id, 1, 99.99, 99.99, 'COMPLETED', NOW() - INTERVAL '12 days', NOW() - INTERVAL '10 days'),
+    (gen_random_uuid(), jane_user_id, content_service_id, 3, 49.99, 149.97, 'CANCELLED', NOW() - INTERVAL '8 days', NOW() - INTERVAL '7 days'),
+
+    -- Sarah's orders
+    (gen_random_uuid(), sarah_user_id, instagram_service_id, 1, 19.99, 19.99, 'COMPLETED', NOW() - INTERVAL '8 days', NOW() - INTERVAL '6 days'),
+    (gen_random_uuid(), sarah_user_id, content_service_id, 2, 49.99, 99.98, 'PROCESSING', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
+
+    -- David's orders
+    (gen_random_uuid(), david_user_id, landing_service_id, 1, 199.99, 199.99, 'PENDING', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
+    (gen_random_uuid(), david_user_id, traffic_service_id, 2, 29.99, 59.98, 'PROCESSING', NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days');
+END $$;
+
+-- 5. INSERT TRANSACTIONS (Deposits, Payments, Refunds)
+DO $$
+DECLARE
+    admin_user_id UUID;
+    john_user_id UUID;
+    jane_user_id UUID;
+    sarah_user_id UUID;
+    david_user_id UUID;
+    
+    john_order1_id UUID;
+    john_order2_id UUID;
+    jane_order1_id UUID;
+    jane_order2_id UUID;
+    jane_order3_id UUID;
+    sarah_order1_id UUID;
+BEGIN
+    -- Get user IDs
+    SELECT id INTO admin_user_id FROM users WHERE email = 'admin@demo.com';
+    SELECT id INTO john_user_id FROM users WHERE email = 'john.doe@gmail.com';
+    SELECT id INTO jane_user_id FROM users WHERE email = 'jane.smith@gmail.com';
+    SELECT id INTO sarah_user_id FROM users WHERE email = 'sarah.johnson@outlook.com';
+    SELECT id INTO david_user_id FROM users WHERE email = 'david.brown@yahoo.com';
+    
+    -- Get some order IDs for transactions
+    SELECT id INTO john_order1_id FROM orders WHERE user_id = john_user_id AND total_amount = 39.98;
+    SELECT id INTO john_order2_id FROM orders WHERE user_id = john_user_id AND total_amount = 29.99;
+    SELECT id INTO jane_order1_id FROM orders WHERE user_id = jane_user_id AND total_amount = 79.99;
+    SELECT id INTO jane_order2_id FROM orders WHERE user_id = jane_user_id AND total_amount = 99.99;
+    SELECT id INTO jane_order3_id FROM orders WHERE user_id = jane_user_id AND total_amount = 149.97;
+    SELECT id INTO sarah_order1_id FROM orders WHERE user_id = sarah_user_id AND total_amount = 19.99;
+
+    -- Insert transactions
+    INSERT INTO transactions (id, user_id, order_id, amount, type, status, description, created_at, updated_at) VALUES
+    -- Initial wallet funding
+    (gen_random_uuid(), admin_user_id, NULL, 1000.00, 'DEPOSIT', 'COMPLETED', 'Initial admin wallet funding', NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'),
+    
+    -- John's transactions
+    (gen_random_uuid(), john_user_id, NULL, 200.00, 'DEPOSIT', 'COMPLETED', 'Wallet top-up via PayPal', NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'),
+    (gen_random_uuid(), john_user_id, john_order1_id, -39.98, 'PAYMENT', 'COMPLETED', 'Payment for Instagram Followers Boost x2', NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
+    (gen_random_uuid(), john_user_id, john_order2_id, -29.99, 'PAYMENT', 'COMPLETED', 'Payment for Website Traffic Boost', NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days'),
+    (gen_random_uuid(), john_user_id, NULL, 50.00, 'DEPOSIT', 'COMPLETED', 'Wallet top-up via Credit Card', NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
+    
+    -- Jane's transactions
+    (gen_random_uuid(), jane_user_id, NULL, 300.00, 'DEPOSIT', 'COMPLETED', 'Wallet top-up via Bank Transfer', NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
+    (gen_random_uuid(), jane_user_id, jane_order1_id, -79.99, 'PAYMENT', 'COMPLETED', 'Payment for SEO Optimization Package', NOW() - INTERVAL '18 days', NOW() - INTERVAL '18 days'),
+    (gen_random_uuid(), jane_user_id, jane_order2_id, -99.99, 'PAYMENT', 'COMPLETED', 'Payment for Professional Logo Design', NOW() - INTERVAL '12 days', NOW() - INTERVAL '12 days'),
+    (gen_random_uuid(), jane_user_id, jane_order3_id, 149.97, 'REFUND', 'COMPLETED', 'Refund for cancelled Content Writing Service', NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days'),
+    (gen_random_uuid(), jane_user_id, NULL, 5.26, 'DEPOSIT', 'COMPLETED', 'Bonus credit for cancellation inconvenience', NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days'),
+    
+    -- Sarah's transactions
+    (gen_random_uuid(), sarah_user_id, NULL, 120.00, 'DEPOSIT', 'COMPLETED', 'Wallet top-up via PayPal', NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
+    (gen_random_uuid(), sarah_user_id, sarah_order1_id, -19.99, 'PAYMENT', 'COMPLETED', 'Payment for Instagram Followers Boost', NOW() - INTERVAL '8 days', NOW() - INTERVAL '8 days'),
+    (gen_random_uuid(), sarah_user_id, NULL, -10.02, 'WITHDRAWAL', 'COMPLETED', 'Withdrawal to PayPal account', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
+    
+    -- David's transactions
+    (gen_random_uuid(), david_user_id, NULL, 200.00, 'DEPOSIT', 'COMPLETED', 'Wallet top-up via Credit Card', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days');
+END $$;
+
+-- 6. VERIFICATION QUERIES
+-- Check current wallet balances
+SELECT 
     u.full_name,
     u.email,
-    w.balance,
+    u.is_admin,
+    u.status,
+    w.balance as wallet_balance,
     (SELECT COUNT(*) FROM orders WHERE user_id = u.id) as total_orders,
     (SELECT COUNT(*) FROM transactions WHERE user_id = u.id) as total_transactions
 FROM users u
-JOIN wallets w ON u.id = w.user_id
+LEFT JOIN wallets w ON u.id = w.user_id
 ORDER BY u.created_at;
 
--- Check order details
-SELECT
+-- Check recent orders
+SELECT 
     o.id,
     u.full_name as customer,
     s.name as service,
     o.quantity,
+    o.unit_price,
     o.total_amount,
     o.status,
     o.created_at
 FROM orders o
 JOIN users u ON o.user_id = u.id
 JOIN services s ON o.service_id = s.id
-ORDER BY o.created_at;
+ORDER BY o.created_at DESC
+LIMIT 10;
 
 -- Check transaction history
-SELECT
+SELECT 
     t.id,
     u.full_name as user,
     t.amount,
@@ -92,47 +228,32 @@ SELECT
     t.created_at
 FROM transactions t
 JOIN users u ON t.user_id = u.id
-ORDER BY t.created_at;
+ORDER BY t.created_at DESC
+LIMIT 15;
 
--- USEFUL QUERIES FOR DEVELOPERS
--- =================================
+-- Service categories summary
+SELECT 
+    category,
+    COUNT(*) as service_count,
+    AVG(price) as avg_price,
+    SUM(CASE WHEN is_active THEN 1 ELSE 0 END) as active_services
+FROM services
+GROUP BY category
+ORDER BY service_count DESC;
 
+-- SAMPLE LOGIN CREDENTIALS
+-- ========================
 /*
--- Get all orders for a user with service details
-SELECT
-    o.*,
-    s.name as service_name,
-    s.price as service_price
-FROM orders o
-JOIN services s ON o.service_id = s.id
-WHERE o.user_id = auth.uid()
-ORDER BY o.created_at DESC;
+Admin Account:
+Email: admin@demo.com
+Password: password123
 
--- Get user transaction history
-SELECT
-    t.*,
-    o.id as order_reference
-FROM transactions t
-LEFT JOIN orders o ON t.order_id = o.id
-WHERE t.user_id = auth.uid()
-ORDER BY t.created_at DESC;
+Regular User Accounts:
+Email: john.doe@gmail.com | Password: password123
+Email: jane.smith@gmail.com | Password: password123  
+Email: sarah.johnson@outlook.com | Password: password123
+Email: david.brown@yahoo.com | Password: password123
+Email: mike.wilson@gmail.com | Password: password123 (INACTIVE)
 
--- Get dashboard stats (admin only)
-SELECT
-    (SELECT COUNT(*) FROM users WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
-    (SELECT COUNT(*) FROM orders WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_orders_30d,
-    (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = 'completed' AND created_at >= CURRENT_DATE - INTERVAL '30 days') as revenue_30d,
-    (SELECT COUNT(*) FROM services WHERE is_active = true) as active_services,
-    (SELECT COUNT(*) FROM orders WHERE status = 'pending') as pending_orders;
-
--- Check wallet balance consistency
-SELECT
-    u.email,
-    w.balance as wallet_balance,
-    COALESCE(SUM(t.amount), 0) as calculated_balance
-FROM users u
-JOIN wallets w ON u.id = w.user_id
-LEFT JOIN transactions t ON u.id = t.user_id AND t.status = 'completed'
-GROUP BY u.id, u.email, w.balance
-HAVING w.balance != COALESCE(SUM(t.amount), 0);
+All accounts use the same password for testing: password123
 */

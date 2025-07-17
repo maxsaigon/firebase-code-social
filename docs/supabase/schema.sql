@@ -225,37 +225,6 @@ CREATE TRIGGER update_wallets_updated_at
     BEFORE UPDATE ON public.wallets
     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
- -- Function to automatically create a user profile when a new user is created in auth.users
-  -- Function to automatically create a user profile when a new user is created in auth.users
- CREATE OR REPLACE FUNCTION public.create_user_profile_on_signup()
- RETURNS TRIGGER AS $$
- BEGIN
-     INSERT INTO public.users (id, email, full_name, avatar_url)
-     VALUES (NEW.id, NEW.email, NULL, NULL); -- Temporarily set full_name and avatar_url to NULL
-     RETURN NEW;
- END;
- $$ LANGUAGE plpgsql SECURITY DEFINER;
- 
- -- Trigger to create user profile for new user
- CREATE TRIGGER on_auth_user_signup
-     AFTER INSERT ON auth.users
-     FOR EACH ROW EXECUTE FUNCTION public.create_user_profile_on_signup();
-
--- Function to automatically create a wallet when a new user is created
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.wallets (user_id, balance)
-    VALUES (NEW.id, 0.00);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Trigger to create wallet for new user
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
 -- Function to update wallet balance on transaction
 CREATE OR REPLACE FUNCTION public.update_wallet_balance()
 RETURNS TRIGGER AS $$
@@ -337,6 +306,10 @@ CREATE POLICY "users_insert_admin" ON public.users
         )
     );
 
+-- Allow new users to create their own profile (for registration)
+CREATE POLICY "users_insert_own" ON public.users
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
 -- Allow admins to delete users
 CREATE POLICY "users_delete_admin" ON public.users
     FOR DELETE USING (
@@ -410,6 +383,10 @@ CREATE POLICY "transactions_manage_admin" ON public.transactions
 CREATE POLICY "wallets_select_own" ON public.wallets
     FOR SELECT USING (auth.uid() = user_id);
 
+-- Allow users to create their own wallet (for registration)
+CREATE POLICY "wallets_insert_own" ON public.wallets
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
 -- Allow users to update their own wallet (via transactions)
 CREATE POLICY "wallets_update_own" ON public.wallets
     FOR UPDATE USING (auth.uid() = user_id)
@@ -428,7 +405,7 @@ CREATE POLICY "wallets_manage_admin" ON public.wallets
 -- =============================================
 
 -- View to display order information with service name
-CREATE VIEW public.order_details AS
+CREATE OR REPLACE VIEW public.order_details AS
 SELECT
     o.*,
     s.name as service_name,
@@ -440,7 +417,7 @@ JOIN public.services s ON o.service_id = s.id
 JOIN public.users u ON o.user_id = u.id;
 
 -- View to display dashboard statistics
-CREATE VIEW public.dashboard_stats AS
+CREATE OR REPLACE VIEW public.dashboard_stats AS
 SELECT
     (SELECT COUNT(*) FROM public.users WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_users_30d,
     (SELECT COUNT(*) FROM public.orders WHERE created_at >= CURRENT_DATE - INTERVAL '30 days') as new_orders_30d,
@@ -529,13 +506,15 @@ BEGIN
     IF NEW.type = 'payment' AND NEW.amount < 0 AND NEW.status = 'completed' THEN
         -- Check balance before deducting money
         IF NOT public.has_sufficient_balance(NEW.user_id, ABS(NEW.amount)) THEN
-            RAISE EXCEPTION 'Insufficient wallet balance for payment';
+            RAISE EXCEPTION 'Insufficient wallet balance for payment. Required: %, Available: %', 
+                ABS(NEW.amount), 
+                public.get_wallet_balance(NEW.user_id);
         END IF;
     END IF;
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER validate_payment_before_insert
     BEFORE INSERT ON public.transactions

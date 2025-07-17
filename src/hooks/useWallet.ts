@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { Wallet, Transaction } from '@/types';
 
 export const useWallet = (userId: string) => {
-  return useQuery<Wallet, Error>({
+  return useQuery<Wallet | null, Error>({
     queryKey: ['wallet', userId],
     queryFn: () => addFundApi.getWallet(userId),
     enabled: !!userId,
