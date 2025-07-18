@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
 import { User } from '@/types';
 
 interface AuthContextType {
@@ -9,49 +8,83 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<any>;
-  session: any | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === 'loading') {
-      setLoading(true);
-      return;
-    }
+    // Check for stored user session on mount
+    const checkSession = () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        }
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+        localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (session?.user) {
-      setUser({
-        id: session.user.id,
-        email: session.user.email!,
-        full_name: session.user.name || '',
-        avatar_url: session.user.image || '',
-        is_admin: session.user.isAdmin || false,
-        status: (session.user.status || 'active') as 'active' | 'inactive' | 'suspended',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-    } else {
-      setUser(null);
-    }
-    
-    setLoading(false);
-  }, [session, status]);
+    checkSession();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
-    // NextAuth signIn is handled by the login page
-    // This is just for compatibility
-    return { error: 'Use NextAuth signIn' };
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { error: result.error || 'Login failed' };
+      }
+
+      const userData: User = {
+        id: result.user.id,
+        email: result.user.email,
+        full_name: result.user.name || result.user.full_name,
+        avatar_url: '',
+        is_admin: result.user.isAdmin || result.user.is_admin,
+        status: result.user.status,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      return { success: true, redirectTo: result.redirectTo };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { error: 'Network error occurred' };
+    }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
+  const signOut = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+    
     setUser(null);
+    localStorage.removeItem('user');
+    window.location.href = '/auth/login';
   };
 
   return (
@@ -59,8 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user, 
       loading, 
       signIn, 
-      signOut: handleSignOut, 
-      session 
+      signOut 
     }}>
       {children}
     </AuthContext.Provider>

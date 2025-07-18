@@ -3,9 +3,9 @@ import { orderApi } from '@/api/orderApi';
 import { toast } from '@/hooks/use-toast';
 import { Order, CreateOrderData } from '@/types';
 
-export const useOrders = (filters?: { search?: string; status?: string }) => {
+export const useOrders = (filters?: { search?: string; status?: string; userId?: string }) => {
   return useQuery<Order[], Error>({
-    queryKey: ['orders'],
+    queryKey: ['orders', filters],
     queryFn: () => orderApi.getOrders(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

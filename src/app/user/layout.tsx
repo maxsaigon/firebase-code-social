@@ -21,7 +21,6 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   const navItems = [
     { label: 'Home', href: '/user' },
     { label: 'My Orders', href: '/user/my-orders' },
-    { label: 'My Transactions', href: '/user/transactions' },
     { label: 'My Wallet', href: '/user/wallet' },
     { label: 'Order Service', href: '/user/order-service' },
   ];

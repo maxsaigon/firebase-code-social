@@ -1,65 +1,85 @@
-import { supabase } from '@/lib/supabaseClient';
 import type { Order, CreateOrderData } from '@/types';
 
 export const orderApi = {
-  async getOrders(filters?: { search?: string; status?: string }): Promise<Order[]> {
-    let query = supabase
-      .from('orders')
-      .select('*');
-
+  async getOrders(filters?: { search?: string; status?: string; userId?: string }): Promise<Order[]> {
+    const searchParams = new URLSearchParams();
+    
+    if (filters?.userId) {
+      searchParams.append('userId', filters.userId);
+    }
     if (filters?.search) {
-      query = query.or(`id.ilike.%${filters.search}%,notes.ilike.%${filters.search}%`);
+      searchParams.append('search', filters.search);
     }
     if (filters?.status && filters.status !== 'all') {
-      query = query.eq('status', filters.status);
+      searchParams.append('status', filters.status);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
+    const response = await fetch(`/api/orders?${searchParams.toString()}`);
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to fetch orders');
+    }
+    
+    return result.data;
   },
 
   async getOrderById(id: string): Promise<Order> {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
+    const response = await fetch(`/api/orders/${id}`);
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to fetch order');
+    }
+    
+    return result.data;
   },
 
   async createOrder(orderData: CreateOrderData): Promise<Order> {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([orderData])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to create order');
+    }
+    
+    return result.data;
   },
 
   async updateOrder(id: string, updates: Partial<Order>): Promise<Order> {
-    const { data, error } = await supabase
-      .from('orders')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const response = await fetch(`/api/orders/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to update order');
+    }
+    
+    return result.data;
   },
 
   async deleteOrder(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    const response = await fetch(`/api/orders/${id}`, {
+      method: 'DELETE',
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to delete order');
+    }
   },
 };

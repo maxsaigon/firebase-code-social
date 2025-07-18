@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabaseClient';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import DashboardCard from '@/components/shared/DashboardCard';
 import RecentOrders from '@/components/shared/RecentOrders';
@@ -14,9 +13,9 @@ export default function DashboardPage() {
   const { data: stats, isLoading, error } = useQuery<DashboardStats, Error>({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('dashboard_stats').select('*').single();
-      if (error) throw error;
-      return data;
+      const response = await fetch('/api/dashboard-stats');
+      if (!response.ok) throw new Error('Failed to fetch dashboard stats');
+      return response.json();
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

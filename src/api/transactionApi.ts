@@ -1,68 +1,55 @@
-import { supabase } from '@/lib/supabaseClient';
 import type { Transaction, CreateTransactionData } from '@/types';
 
 export const transactionApi = {
-  async getTransactions(filters?: { search?: string; type?: string; status?: string }): Promise<Transaction[]> {
-    let query = supabase
-      .from('transactions')
-      .select('*');
-
-    if (filters?.search) {
-      query = query.or(`description.ilike.%${filters.search}%,reference_id.ilike.%${filters.search}%`);
+  async getTransactions(filters?: { search?: string; type?: string; status?: string; userId?: string }): Promise<Transaction[]> {
+    const searchParams = new URLSearchParams();
+    
+    if (filters?.userId) {
+      searchParams.append('userId', filters.userId);
     }
     if (filters?.type && filters.type !== 'all') {
-      query = query.eq('type', filters.type);
+      searchParams.append('type', filters.type);
     }
-    if (filters?.status && filters.status !== 'all') {
-      query = query.eq('status', filters.status);
+    if (filters?.search) {
+      searchParams.append('search', filters.search);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
+    const response = await fetch(`/api/transactions?${searchParams.toString()}`);
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to fetch transactions');
+    }
+    
+    return result.data;
   },
 
   async getTransactionById(id: string): Promise<Transaction> {
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
+    const response = await fetch(`/api/transactions/${id}`);
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to fetch transaction');
+    }
+    
+    return result.data;
   },
 
   async createTransaction(transactionData: CreateTransactionData): Promise<Transaction> {
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([transactionData])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction> {
-    const { data, error } = await supabase
-      .from('transactions')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async deleteTransaction(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('transactions')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    const response = await fetch('/api/transactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transactionData),
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to create transaction');
+    }
+    
+    return result.data;
   },
 };

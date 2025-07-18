@@ -7,9 +7,9 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { signIn } from 'next-auth/react';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthProvider';
 import Link from 'next/link';
 
 const loginSchema = z.object({
@@ -21,37 +21,33 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormInputs) => {
-    console.log("Attempting login...");
     try {
-      const result = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+      const result = await signIn(data.email, data.password);
 
-      if (result?.error) {
+      if (result.error) {
         toast({
           title: "Error",
-          description: "Invalid email or password",
+          description: result.error,
           variant: "destructive",
         });
         return;
       }
 
-      if (result?.ok) {
-        toast({
-          title: "Success",
-          description: "Logged in successfully!",
-        });
-        router.push('/admin/dashboard');
-      }
-    } catch (error) {
+      toast({
+        title: "Success",
+        description: "Logged in successfully!",
+      });
+      
+      // Redirect based on user role from the API response
+      router.push(result.redirectTo || '/user');
+    } catch (error: any) {
       console.error("Login error:", error);
       toast({
         title: "Error",

@@ -3,9 +3,9 @@ import { transactionApi } from '@/api/transactionApi';
 import { toast } from '@/hooks/use-toast';
 import { Transaction, CreateTransactionData } from '@/types';
 
-export const useTransactions = (filters?: { search?: string; type?: string; status?: string }) => {
+export const useTransactions = (filters?: { search?: string; type?: string; status?: string; userId?: string }) => {
   return useQuery<Transaction[], Error>({
-    queryKey: ['transactions'],
+    queryKey: ['transactions', filters],
     queryFn: () => transactionApi.getTransactions(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

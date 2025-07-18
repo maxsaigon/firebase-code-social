@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useAuth } from '@/contexts/AuthProvider';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import DataTable from '@/components/shared/DataTable';
 import { Transaction as TransactionType } from '@/types';
 
 export default function TransactionPage() {
-  const { data: transactions, isLoading, error } = useTransactions(); // This will fetch all transactions, need to filter by user_id later
+  const { user } = useAuth();
+  const { data: transactions, isLoading, error } = useTransactions({ userId: user?.id });
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500">Error loading your transactions: {error.message}</div>;

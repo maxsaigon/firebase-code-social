@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useServices } from '@/hooks/useServices';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
-import ServiceCard from '@/app/admin/services/ServiceCard';
+import UserServiceCard from '@/components/shared/UserServiceCard';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -13,8 +13,6 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Service } from '@/types';
-import { addFundApi } from '@/api/addFundApi';
-import { transactionApi } from '@/api/transactionApi';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -28,105 +26,44 @@ export default function HomePage() {
   const handleOrderService = (service: Service) => {
     if (!user) {
       toast({
-        title: "Error",
-        description: "You must be logged in to place an order.",
+        title: "Authentication Required",
+        description: "Please log in to place an order.",
         variant: "destructive",
       });
       router.push('/auth/login');
       return;
     }
+
     setSelectedService(service);
     setIsOrderModalOpen(true);
   };
 
   const handleCreateOrder = async (data: { quantity: number; notes?: string }) => {
-    console.log("handleCreateOrder: Function started.");
-    if (!user || !selectedService) {
-      console.log("handleCreateOrder: User or selectedService is missing.");
-      return;
-    }
-
-    const totalAmount = data.quantity * selectedService.price;
-    console.log("handleCreateOrder: Total amount calculated:", totalAmount);
+    if (!user || !selectedService) return;
 
     try {
-      // 1. Check wallet balance
-      console.log("handleCreateOrder: Checking wallet balance...");
-      const walletResult = await addFundApi.getWallet(user.id);
-      const wallet = walletResult; // Directly assign the result
-      console.log("handleCreateOrder: Wallet data received:", wallet);
-
-      if (walletResult.error) { // Check for error property on the result
-        console.error("handleCreateOrder: Wallet fetch error:", walletResult.error);
-        toast({
-          title: "Error",
-          description: `Error checking wallet balance: ${walletResult.error.message}`,
-          variant: "destructive",
-        });
-        setIsOrderModalOpen(false);
-        return;
-      }
-
-      if (!wallet) {
-        console.warn("handleCreateOrder: No wallet found for user:", user.id);
-        toast({
-          title: "Error",
-          description: "No wallet found for your account. Please contact support.",
-          variant: "destructive",
-        });
-        setIsOrderModalOpen(false);
-        return;
-      }
-
-      if (wallet.balance < totalAmount) {
-        console.warn("handleCreateOrder: Insufficient wallet balance.");
-        toast({
-          title: "Error",
-          description: "Insufficient wallet balance. Please add funds.",
-          variant: "destructive",
-        });
-        setIsOrderModalOpen(false);
-        return;
-      }
-      console.log("handleCreateOrder: Wallet balance sufficient.");
-
-      // 2. Create Order
-      console.log("handleCreateOrder: Creating order...");
-      const newOrder = await createOrderMutation.mutateAsync({
+      const total_amount = selectedService.price * data.quantity;
+      
+      await createOrderMutation.mutateAsync({
         user_id: user.id,
         service_id: selectedService.id,
         quantity: data.quantity,
         unit_price: selectedService.price,
-        total_amount: totalAmount,
-        status: 'pending', // Always pending initially
+        total_amount: total_amount,
         notes: data.notes,
       });
-      console.log("handleCreateOrder: New order created:", newOrder);
-
-      // 3. Create Payment Transaction
-      console.log("handleCreateOrder: Creating payment transaction...");
-      await transactionApi.createTransaction({
-        user_id: user.id,
-        order_id: newOrder.id,
-        amount: -totalAmount, // Negative for payment
-        type: 'payment',
-        status: 'completed',
-        description: `Payment for ${selectedService.name}`,
-      });
-      console.log("handleCreateOrder: Payment transaction created.");
-
-      toast({
-        title: "Success",
-        description: "Order placed and payment processed successfully!",
-      });
+      
       setIsOrderModalOpen(false);
       setSelectedService(null);
-      router.push('/user/my-orders'); // Redirect to my orders page
-    } catch (err: any) {
-      console.error("handleCreateOrder: Error during order/payment process:", err);
+      
+      toast({
+        title: "Success",
+        description: "Order placed successfully!",
+      });
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: err.message || "Failed to place order or process payment.",
+        description: error.message || "Failed to place order",
         variant: "destructive",
       });
     }
@@ -137,30 +74,45 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Available Services</h1>
-      <p className="text-gray-600">Browse our service offerings and place your orders.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Available Services</h1>
+          <p className="text-gray-600">Browse and order our digital services.</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services?.map((service) => (
           <div key={service.id} className="relative">
-            <ServiceCard service={service} onEdit={() => {}} onDelete={() => {}} />
-            <Button
-              className="absolute bottom-4 right-4"
-              onClick={() => handleOrderService(service)}
-            >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Order Now
-            </Button>
+            <UserServiceCard service={service} />
+            <div className="mt-4">
+              <Button 
+                onClick={() => handleOrderService(service)}
+                className="w-full"
+                disabled={!service.is_active}
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                {service.is_active ? 'Order Now' : 'Unavailable'}
+              </Button>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Order Service Modal */}
+      {(!services || services.length === 0) && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No services available at the moment.</p>
+        </div>
+      )}
+
+      {/* Order Modal */}
       <Dialog open={isOrderModalOpen} onOpenChange={setIsOrderModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Order Service: {selectedService?.name}</DialogTitle>
-            <DialogDescription>Fill in the details to place your order.</DialogDescription>
+            <DialogTitle>Order Service</DialogTitle>
+            <DialogDescription>
+              {selectedService ? `Order ${selectedService.name}` : 'Order Service'}
+            </DialogDescription>
           </DialogHeader>
           {selectedService && (
             <OrderForm

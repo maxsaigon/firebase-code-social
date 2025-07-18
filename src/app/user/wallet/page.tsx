@@ -1,132 +1,245 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useWallet } from '@/hooks/useWallet';
 import { useAuth } from '@/contexts/AuthProvider';
-import { useWallet, useAddFunds, useWithdrawFunds } from '@/hooks/useWallet';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Wallet, Plus, History, DollarSign, ArrowRight } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const fundSchema = z.object({
-  amount: z.preprocess(
-    (val) => Number(val),
-    z.number().min(0.01, 'Amount must be greater than 0')
-  ),
-});
-
-type FundFormInputs = z.infer<typeof fundSchema>;
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Link from 'next/link';
 
 export default function WalletPage() {
   const { user } = useAuth();
-  const { data: wallet, isLoading, error } = useWallet(user?.id || '');
-  const addFundsMutation = useAddFunds();
-  const withdrawFundsMutation = useWithdrawFunds();
+  const { data: wallet, isLoading, error, refetch } = useWallet(user?.id);
+  const [isAddingFunds, setIsAddingFunds] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
 
-  const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState(false);
-  const [isWithdrawFundsModalOpen, setIsWithdrawFundsModalOpen] = useState(false);
-
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FundFormInputs>({
-    resolver: zodResolver(fundSchema),
-  });
-
-  const handleAddFunds = async (data: FundFormInputs) => {
-    if (!user) return;
-    try {
-      await addFundsMutation.mutateAsync({ userId: user.id, amount: data.amount });
-      setIsAddFundsModalOpen(false);
-      reset();
-    } catch (err: any) {
+  const handleAddFunds = async () => {
+    if (!user || !amount || parseFloat(amount) <= 0) {
       toast({
         title: "Error",
-        description: err.message || "Failed to add funds.",
+        description: "Please enter a valid amount",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsAddingFunds(true);
+    try {
+      const response = await fetch('/api/wallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          amount: parseFloat(amount),
+          description: description || 'Wallet top-up',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to add funds');
+      }
+
+      await refetch();
+      setAmount('');
+      setDescription('');
+      toast({
+        title: "Success",
+        description: "Funds added successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add funds",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingFunds(false);
     }
   };
 
-  const handleWithdrawFunds = async (data: FundFormInputs) => {
-    if (!user) return;
-    try {
-      await withdrawFundsMutation.mutateAsync({ userId: user.id, amount: data.amount });
-      setIsWithdrawFundsModalOpen(false);
-      reset();
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err.message || "Failed to withdraw funds.",
-        variant: "destructive",
-      });
-    }
-  };
+  if (!user) {
+    return <div className="text-center py-12">Please log in to view your wallet.</div>;
+  }
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500">Error loading wallet: {error.message}</div>;
-  if (!user) return <div className="text-gray-600">Please log in to view your wallet.</div>;
-  if (wallet === null) return <div className="text-gray-600">No wallet found for this user. A wallet should be created automatically upon user registration.</div>;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">My Wallet</h1>
-      <p className="text-gray-600">Manage your account balance.</p>
-
-      <div className="bg-white rounded-lg border p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Current Balance</h2>
-        <p className="text-4xl font-bold text-green-600">${wallet?.balance.toFixed(2) || '0.00'}</p>
-        <div className="mt-6 flex gap-4">
-          <Button onClick={() => setIsAddFundsModalOpen(true)}>
-            Add Funds
-          </Button>
-          <Button variant="outline" onClick={() => setIsWithdrawFundsModalOpen(true)}>
-            Withdraw Funds
-          </Button>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">My Wallet</h1>
+          <p className="text-gray-600">Manage your account balance and transactions.</p>
         </div>
       </div>
 
-      {/* Add Funds Modal */}
-      <Dialog open={isAddFundsModalOpen} onOpenChange={setIsAddFundsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Funds</DialogTitle>
-            <DialogDescription>Enter the amount you wish to add to your wallet.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(handleAddFunds)} className="space-y-4">
+      {/* Balance Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="w-5 h-5" />
+            Current Balance
+          </CardTitle>
+          <CardDescription>
+            Your available balance for ordering services
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="add-amount">Amount</Label>
-              <Input id="add-amount" type="number" step="0.01" {...register('amount')} />
-              {errors.amount && <p className="text-red-500 text-sm">{errors.amount.message}</p>}
+              <span className="text-3xl font-bold text-green-600">
+                ${wallet?.balance?.toFixed(2) || '0.00'}
+              </span>
             </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Adding...' : 'Confirm Add Funds'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Funds
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Funds to Wallet</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="amount">Amount ($)</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Input
+                      id="description"
+                      placeholder="e.g., Account top-up"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleAddFunds} 
+                    disabled={isAddingFunds || !amount || parseFloat(amount) <= 0}
+                    className="w-full"
+                  >
+                    {isAddingFunds ? 'Adding...' : 'Add Funds'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Withdraw Funds Modal */}
-      <Dialog open={isWithdrawFundsModalOpen} onOpenChange={setIsWithdrawFundsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Withdraw Funds</DialogTitle>
-            <DialogDescription>Enter the amount you wish to withdraw from your wallet.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(handleWithdrawFunds)} className="space-y-4">
-            <div>
-              <Label htmlFor="withdraw-amount">Amount</Label>
-              <Input id="withdraw-amount" type="number" step="0.01" {...register('amount')} />
-              {errors.amount && <p className="text-red-500 text-sm">{errors.amount.message}</p>}
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Deposited</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  ${wallet?.total_deposited?.toFixed(2) || '0.00'}
+                </p>
+              </div>
+              <DollarSign className="w-8 h-8 text-blue-600" />
             </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Withdrawing...' : 'Confirm Withdraw Funds'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-2xl font-bold text-red-600">
+                  ${wallet?.total_spent?.toFixed(2) || '0.00'}
+                </p>
+              </div>
+              <History className="w-8 h-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Available</p>
+                <p className="text-2xl font-bold text-green-600">
+                  ${wallet?.balance?.toFixed(2) || '0.00'}
+                </p>
+              </div>
+              <Wallet className="w-8 h-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Transaction History */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Recent Transactions</CardTitle>
+              <CardDescription>
+                Your latest wallet activity
+              </CardDescription>
+            </div>
+            <Link href="/user/transactions">
+              <Button variant="outline" size="sm">
+                View All
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {wallet?.transactions && wallet.transactions.length > 0 ? (
+            <div className="space-y-3">
+              {wallet.transactions.slice(0, 10).map((transaction, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0">
+                  <div>
+                    <p className="font-medium">{transaction.description}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(transaction.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-bold ${
+                      transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'deposit' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-500 capitalize">{transaction.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No transactions yet. Add funds to get started!
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

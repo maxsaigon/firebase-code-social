@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { useOrders } from '@/hooks/useOrders';
+import { useAuth } from '@/contexts/AuthProvider';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import DataTable from '@/components/shared/DataTable';
 import { Order as OrderType } from '@/types';
 
 export default function MyOrdersPage() {
-  const { data: orders, isLoading, error } = useOrders(); // This will fetch all orders, need to filter by user_id later
+  const { user } = useAuth();
+  const { data: orders, isLoading, error } = useOrders({ userId: user?.id });
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500">Error loading your orders: {error.message}</div>;
