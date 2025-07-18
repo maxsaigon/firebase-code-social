@@ -25,8 +25,6 @@ import { Search, Package2 } from 'lucide-react';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import AdminSidebar from './AdminSidebar';
-import { useAuth } from '@/contexts/AuthProvider';
-import { useRouter } from 'next/navigation';
 
 export function Header() {
   const { signOut } = useAuth();

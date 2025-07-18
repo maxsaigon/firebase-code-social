@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { OrderForm } from '@/components/OrderForm';
 import { Order as OrderType, CreateOrderData } from '@/types';
 
 export default function OrderManagementPage() {
@@ -178,7 +177,8 @@ export default function OrderManagementPage() {
             <DialogTitle>Create New Order</DialogTitle>
             <DialogDescription>Fill in the details to create a new order.</DialogDescription>
           </DialogHeader>
-          <OrderForm onSubmit={handleCreateOrder} isSubmitting={createOrderMutation.isPending} />
+          {/* TODO: Create proper admin order form */}
+          <p className="text-gray-500">Order creation form needs to be implemented for admin interface.</p>
         </DialogContent>
       </Dialog>
 
@@ -190,11 +190,10 @@ export default function OrderManagementPage() {
             <DialogDescription>Update the order details.</DialogDescription>
           </DialogHeader>
           {selectedOrder && (
-            <OrderForm
-              order={selectedOrder}
-              onSubmit={handleUpdateOrder}
-              isSubmitting={updateOrderMutation.isPending}
-            />
+            <div>
+              {/* TODO: Create proper admin order edit form */}
+              <p className="text-gray-500">Order editing form needs to be implemented for admin interface.</p>
+            </div>
           )}
         </DialogContent>
       </Dialog>

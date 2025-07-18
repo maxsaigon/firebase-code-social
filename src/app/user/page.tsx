@@ -52,33 +52,35 @@ export default function HomePage() {
     try {
       // 1. Check wallet balance
       console.log("handleCreateOrder: Checking wallet balance...");
-      const walletResult = await addFundApi.getWallet(user.id);
-      const wallet = walletResult; // Directly assign the result
-      console.log("handleCreateOrder: Wallet data received:", wallet);
+      let wallet;
+      try {
+        const walletResult = await addFundApi.getWallet(user.id);
+        wallet = walletResult; // Directly assign the result
+        console.log("handleCreateOrder: Wallet data received:", wallet);
 
-      if (walletResult.error) { // Check for error property on the result
-        console.error("handleCreateOrder: Wallet fetch error:", walletResult.error);
+        if (!wallet) {
+          console.error("handleCreateOrder: No wallet found for user");
+          toast({
+            title: "Error",
+            description: "No wallet found for user",
+            variant: "destructive",
+          });
+          setIsOrderModalOpen(false);
+          return;
+        }
+
+      } catch (walletError: any) {
+        console.error("handleCreateOrder: Error fetching wallet:", walletError);
         toast({
           title: "Error",
-          description: `Error checking wallet balance: ${walletResult.error.message}`,
+          description: "Failed to check wallet balance. Please try again.",
           variant: "destructive",
         });
         setIsOrderModalOpen(false);
         return;
       }
 
-      if (!wallet) {
-        console.warn("handleCreateOrder: No wallet found for user:", user.id);
-        toast({
-          title: "Error",
-          description: "No wallet found for your account. Please contact support.",
-          variant: "destructive",
-        });
-        setIsOrderModalOpen(false);
-        return;
-      }
-
-      if (wallet.balance < totalAmount) {
+      if (wallet!.balance < totalAmount) {
         console.warn("handleCreateOrder: Insufficient wallet balance.");
         toast({
           title: "Error",
