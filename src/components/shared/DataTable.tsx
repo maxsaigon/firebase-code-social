@@ -5,11 +5,11 @@ interface DataTableProps<T> {
   columns: {
     key: string;
     header: string;
-    render?: (value: unknown, row: T) => React.ReactNode;
+    render?: (value: any, row: T) => React.ReactNode;
   }[];
 }
 
-const DataTable = <T extends Record<string, unknown>>({ data, columns }: DataTableProps<T>) => {
+const DataTable = <T extends Record<string, any>>({ data, columns }: DataTableProps<T>) => {
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">

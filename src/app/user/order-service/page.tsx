@@ -78,10 +78,10 @@ export default function OrderServicePage() {
         description: "Order placed successfully!",
       });
       router.push('/user/my-orders');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "Failed to place order.",
+        description: error instanceof Error ? error.message : "Failed to place order.",
         variant: "destructive",
       });
     }

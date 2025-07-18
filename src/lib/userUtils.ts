@@ -5,7 +5,7 @@ export const userUtils = {
    * Ensures that user profile and wallet exist for a given user ID
    * This is a utility function that can be called from anywhere
    */
-  async ensureUserDataExists(userId: string, email: string, fullName?: string) {
+  async ensureUserDataExists(userId: string, _email: string, _fullName?: string) {
     try {
             // Check if profile already exists
       const { data: existingProfile, error: checkError } = await supabase

@@ -41,10 +41,10 @@ export default function WalletPage() {
       await addFundsMutation.mutateAsync({ userId: user.id, amount: data.amount });
       setIsAddFundsModalOpen(false);
       reset();
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Error",
-        description: err.message || "Failed to add funds.",
+        description: err instanceof Error ? err.message : "Failed to add funds.",
         variant: "destructive",
       });
     }
@@ -56,10 +56,10 @@ export default function WalletPage() {
       await withdrawFundsMutation.mutateAsync({ userId: user.id, amount: data.amount });
       setIsWithdrawFundsModalOpen(false);
       reset();
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Error",
-        description: err.message || "Failed to withdraw funds.",
+        description: err instanceof Error ? err.message : "Failed to withdraw funds.",
         variant: "destructive",
       });
     }
