@@ -1,3 +1,5 @@
+// TODO: LEGACY CODE - This file should be removed after full migration to PostgreSQL
+// The application should use direct PostgreSQL queries instead of Supabase client
 import { createClient } from '@supabase/supabase-js';
 import { mockSupabase } from './mockSupabase';
 

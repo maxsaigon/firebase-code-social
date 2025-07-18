@@ -13,6 +13,7 @@ export interface CreateUserData {
   email: string;
   password?: string;
   full_name?: string;
+  status: 'active' | 'inactive' | 'suspended';
 }
 
 export interface Service {
@@ -74,7 +75,7 @@ export interface CreateTransactionData {
   order_id?: string;
   amount: number;
   type: 'deposit' | 'withdrawal' | 'payment' | 'refund' | 'commission';
-  status?: 'pending' | 'completed' | 'failed' | 'cancelled';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
   description?: string;
   reference_id?: string;
 }

@@ -47,10 +47,10 @@ export default function RegisterPage() {
         description: "Account created successfully! Please log in.",
       });
       router.push('/auth/login');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "Failed to register.",
+        description: error instanceof Error ? error.message : "Failed to register.",
         variant: "destructive",
       });
     }

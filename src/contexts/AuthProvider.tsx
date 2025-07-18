@@ -7,8 +7,8 @@ import { User } from '@/types';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<any>;
-  signOut: () => Promise<any>;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
   session: any | null;
 }
 
@@ -43,10 +43,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, [session, status]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async () => {
     // NextAuth signIn is handled by the login page
     // This is just for compatibility
-    return { error: 'Use NextAuth signIn' };
+    throw new Error('Use NextAuth signIn');
   };
 
   const handleSignOut = async () => {

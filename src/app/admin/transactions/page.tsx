@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, DollarSign, Edit, Trash } from 'lucide-react';
+import { Plus, Edit, Trash } from 'lucide-react';
 import { useTransactions, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions';
 import { useDebounce } from '@/hooks/useDebounce';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -38,10 +38,11 @@ export default function TransactionManagementPage() {
     setIsCreateModalOpen(false);
   };
 
-  const handleEditTransaction = (transaction: TransactionType) => {
-    setSelectedTransaction(transaction);
-    setIsEditModalOpen(true);
-  };
+  // TODO: Implement transaction editing
+  // const handleEditTransaction = (transaction: TransactionType) => {
+  //   setSelectedTransaction(transaction);
+  //   setIsEditModalOpen(true);
+  // };
 
   const handleUpdateTransaction = async (data: CreateTransactionData) => {
     if (selectedTransaction) {

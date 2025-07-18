@@ -16,7 +16,8 @@ export default function TestRegistrationPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    full_name: ''
+    full_name: '',
+    status: 'active' as const
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -55,7 +56,8 @@ export default function TestRegistrationPage() {
       setFormData({
         email: '',
         password: '',
-        full_name: ''
+        full_name: '',
+        status: 'active' as const
       });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Registration failed');

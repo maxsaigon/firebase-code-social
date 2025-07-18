@@ -5,7 +5,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // In a real implementation, you would:
     // 1. Check for authentication token/session

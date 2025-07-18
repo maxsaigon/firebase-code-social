@@ -11,7 +11,7 @@ import { Transaction, CreateTransactionData } from '@/types';
 
 const transactionSchema = z.object({
   user_id: z.string().min(1, 'User ID is required'),
-  order_id: z.string().optional().nullable(),
+  order_id: z.string().optional(),
   amount: z.preprocess(
     (val) => Number(val),
     z.number().min(0, 'Amount must be a positive number')
@@ -33,7 +33,7 @@ export const TransactionForm = ({ transaction, onSubmit, isSubmitting }: Transac
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       user_id: transaction?.user_id || '',
-      order_id: transaction?.order_id || null,
+      order_id: transaction?.order_id || undefined,
       amount: transaction?.amount || 0,
       type: transaction?.type || 'payment',
       status: transaction?.status || 'completed',
@@ -45,7 +45,7 @@ export const TransactionForm = ({ transaction, onSubmit, isSubmitting }: Transac
   React.useEffect(() => {
     if (transaction) {
       setValue('user_id', transaction.user_id);
-      setValue('order_id', transaction.order_id || null);
+      setValue('order_id', transaction.order_id || undefined);
       setValue('amount', transaction.amount);
       setValue('type', transaction.type);
       setValue('status', transaction.status);

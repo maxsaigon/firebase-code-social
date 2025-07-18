@@ -1,3 +1,4 @@
+// TODO: LEGACY CODE - This file should be removed after full migration to PostgreSQL
 // Mock implementation for testing when Supabase is not available
 export const mockSupabase = {
   auth: {

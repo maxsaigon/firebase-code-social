@@ -4,7 +4,6 @@ import React from 'react';
 import { useTransactions } from '@/hooks/useTransactions';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import DataTable from '@/components/shared/DataTable';
-import { Transaction as TransactionType } from '@/types';
 
 export default function TransactionPage() {
   const { data: transactions, isLoading, error } = useTransactions(); // This will fetch all transactions, need to filter by user_id later
