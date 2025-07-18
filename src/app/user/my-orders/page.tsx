@@ -4,7 +4,6 @@ import React from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import DataTable from '@/components/shared/DataTable';
-import { Order as OrderType } from '@/types';
 
 export default function MyOrdersPage() {
   const { data: orders, isLoading, error } = useOrders(); // This will fetch all orders, need to filter by user_id later

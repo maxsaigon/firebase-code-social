@@ -177,7 +177,7 @@ export default function UserManagementPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update the user's account details.</DialogDescription>
+            <DialogDescription>Update the user&apos;s account details.</DialogDescription>
           </DialogHeader>
           {selectedUser && (
             <UserForm

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -22,11 +22,11 @@ export async function GET() {
       users: users
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Database connection failed:', error);
     return NextResponse.json({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Database connection failed'
     }, { status: 500 });
   }
 }

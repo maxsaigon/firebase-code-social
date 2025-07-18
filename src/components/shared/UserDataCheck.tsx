@@ -70,7 +70,7 @@ export const UserDataCheck = ({ children }: UserDataCheckProps) => {
     if (session?.user && user) {
       checkUserData();
     }
-  }, [session?.user, user]);
+  }, [session?.user, user, checkUserData]);
 
   if (loading) {
     return (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, ShoppingCart, Edit, Trash } from 'lucide-react';
+import { Plus, Edit, Trash } from 'lucide-react';
 import { useOrders, useCreateOrder, useUpdateOrder, useDeleteOrder } from '@/hooks/useOrders';
 import { useDebounce } from '@/hooks/useDebounce';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Order as OrderType, CreateOrderData } from '@/types';
+import { Order as OrderType } from '@/types';
 
 export default function OrderManagementPage() {
   const [search, setSearch] = useState('');
@@ -26,27 +26,26 @@ export default function OrderManagementPage() {
     status: statusFilter,
   });
 
-  const createOrderMutation = useCreateOrder();
-  const updateOrderMutation = useUpdateOrder();
   const deleteOrderMutation = useDeleteOrder();
 
-  const handleCreateOrder = async (data: CreateOrderData) => {
-    await createOrderMutation.mutateAsync(data);
-    setIsCreateModalOpen(false);
-  };
+  // TODO: Implement proper admin order forms
+  // const handleCreateOrder = async (data: CreateOrderData) => {
+  //   await createOrderMutation.mutateAsync(data);
+  //   setIsCreateModalOpen(false);
+  // };
 
-  const handleEditOrder = (order: OrderType) => {
-    setSelectedOrder(order);
-    setIsEditModalOpen(true);
-  };
+  // const handleEditOrder = (order: OrderType) => {
+  //   setSelectedOrder(order);
+  //   setIsEditModalOpen(true);
+  // };
 
-  const handleUpdateOrder = async (data: CreateOrderData) => {
-    if (selectedOrder) {
-      await updateOrderMutation.mutateAsync({ id: selectedOrder.id, updates: data });
-      setIsEditModalOpen(false);
-      setSelectedOrder(null);
-    }
-  };
+  // const handleUpdateOrder = async (data: CreateOrderData) => {
+  //   if (selectedOrder) {
+  //     await updateOrderMutation.mutateAsync({ id: selectedOrder.id, updates: data });
+  //     setIsEditModalOpen(false);
+  //     setSelectedOrder(null);
+  //   }
+  // };
 
   const handleDeleteOrder = async (orderId: string) => {
     if (window.confirm('Are you sure you want to delete this order?')) {

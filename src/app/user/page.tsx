@@ -69,7 +69,7 @@ export default function HomePage() {
           return;
         }
 
-      } catch (walletError: any) {
+      } catch (walletError: unknown) {
         console.error("handleCreateOrder: Error fetching wallet:", walletError);
         toast({
           title: "Error",
@@ -124,11 +124,11 @@ export default function HomePage() {
       setIsOrderModalOpen(false);
       setSelectedService(null);
       router.push('/user/my-orders'); // Redirect to my orders page
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("handleCreateOrder: Error during order/payment process:", err);
       toast({
         title: "Error",
-        description: err.message || "Failed to place order or process payment.",
+        description: err instanceof Error ? err.message : "Failed to place order or process payment.",
         variant: "destructive",
       });
     }
