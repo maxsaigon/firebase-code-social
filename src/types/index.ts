@@ -13,6 +13,8 @@ export interface CreateUserData {
   email: string;
   password?: string;
   full_name?: string;
+  is_admin?: boolean;
+  status?: 'active' | 'inactive' | 'suspended';
 }
 
 export interface Service {
@@ -20,7 +22,7 @@ export interface Service {
   name: string;
   description?: string;
   price: number;
-  is_active: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
   category?: string;
   created_at: string;
   updated_at: string;
@@ -30,7 +32,7 @@ export interface CreateServiceData {
   name: string;
   description?: string;
   price: number;
-  is_active: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
   category?: string;
 }
 
@@ -41,7 +43,7 @@ export interface Order {
   quantity: number;
   unit_price: number;
   total_amount: number;
-  status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -53,7 +55,7 @@ export interface CreateOrderData {
   quantity: number;
   unit_price: number;
   total_amount: number;
-  status?: 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded';
+  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
   notes?: string;
 }
 

@@ -11,16 +11,16 @@ export async function GET(request: NextRequest) {
 
     try {
       // Get counts from different tables
-      const [usersResult, servicesResult, ordersResult, transactionsResult] = await Promise.all([
+      const [usersResult, servicesResult, ordersResult, revenueResult] = await Promise.all([
         client.query('SELECT COUNT(*) as total_users FROM users'),
         client.query('SELECT COUNT(*) as total_services FROM services'),
         client.query('SELECT COUNT(*) as total_orders FROM orders'),
-        client.query('SELECT SUM(amount) as total_revenue FROM transactions WHERE type = \'payment\' AND status = \'completed\''),
+        client.query('SELECT SUM(total_amount) as total_revenue FROM orders WHERE status = \'COMPLETED\''),
       ]);
 
       // Get pending orders count
       const pendingOrdersResult = await client.query(
-        'SELECT COUNT(*) as pending_orders FROM orders WHERE status = \'pending\''
+        'SELECT COUNT(*) as pending_orders FROM orders WHERE status = \'PENDING\''
       );
 
       const stats = {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         total_services: parseInt(servicesResult.rows[0].total_services) || 0,
         total_orders: parseInt(ordersResult.rows[0].total_orders) || 0,
         pending_orders: parseInt(pendingOrdersResult.rows[0].pending_orders) || 0,
-        total_revenue: parseFloat(transactionsResult.rows[0].total_revenue) || 0,
+        total_revenue: parseFloat(revenueResult.rows[0].total_revenue) || 0,
       };
 
       return NextResponse.json(stats);

@@ -3,8 +3,11 @@
 import React, { useState } from 'react';
 import { Plus, ShoppingCart, Edit, Trash } from 'lucide-react';
 import { useOrders, useCreateOrder, useUpdateOrder, useDeleteOrder } from '@/hooks/useOrders';
+import { useUsers } from '@/hooks/useUsers';
+import { useServices } from '@/hooks/useServices';
 import { useDebounce } from '@/hooks/useDebounce';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { StatusBadge } from '@/components/shared/StatusBadge';
 import DataTable from '@/components/shared/DataTable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,6 +30,9 @@ export default function OrderManagementPage() {
     status: statusFilter,
   });
 
+  const { data: users } = useUsers();
+  const { data: services } = useServices();
+
   const createOrderMutation = useCreateOrder();
   const updateOrderMutation = useUpdateOrder();
   const deleteOrderMutation = useDeleteOrder();
@@ -41,11 +47,46 @@ export default function OrderManagementPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateOrder = async (data: CreateOrderData) => {
+  const handleUpdateOrder = async (data: CreateOrderData & { status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED' }) => {
     if (selectedOrder) {
+      // Check if status changed to cancelled and handle refund
+      if (data.status === 'CANCELLED' && selectedOrder.status !== 'CANCELLED') {
+        // Trigger refund process
+        await handleRefundOrder(selectedOrder.id, selectedOrder.total_amount, selectedOrder.user_id);
+      }
+      
       await updateOrderMutation.mutateAsync({ id: selectedOrder.id, updates: data });
       setIsEditModalOpen(false);
       setSelectedOrder(null);
+    }
+  };
+
+  const handleRefundOrder = async (orderId: string, amount: number, userId: string) => {
+    try {
+      // Call API to refund money to user's wallet
+      const response = await fetch('/api/wallet/refund', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          amount: amount,
+          transaction_type: 'refund',
+          description: `Refund for cancelled order #${orderId}`,
+          order_id: orderId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process refund');
+      }
+
+      // Show success message
+      console.log('Refund processed successfully');
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      throw error;
     }
   };
 
@@ -125,17 +166,7 @@ export default function OrderManagementPage() {
             key: 'status',
             header: 'Status',
             render: (value) => (
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                value === 'completed'
-                  ? 'bg-green-100 text-green-800'
-                  : value === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : value === 'cancelled'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {value}
-              </span>
+              <StatusBadge status={value} type="order" />
             ),
           },
           {
@@ -178,7 +209,12 @@ export default function OrderManagementPage() {
             <DialogTitle>Create New Order</DialogTitle>
             <DialogDescription>Fill in the details to create a new order.</DialogDescription>
           </DialogHeader>
-          <OrderForm onSubmit={handleCreateOrder} isSubmitting={createOrderMutation.isPending} />
+          <OrderForm 
+            onSubmit={handleCreateOrder} 
+            isSubmitting={createOrderMutation.isPending}
+            users={users || []}
+            services={services || []}
+          />
         </DialogContent>
       </Dialog>
 
@@ -194,6 +230,9 @@ export default function OrderManagementPage() {
               order={selectedOrder}
               onSubmit={handleUpdateOrder}
               isSubmitting={updateOrderMutation.isPending}
+              users={users || []}
+              services={services || []}
+              isEditMode={true}
             />
           )}
         </DialogContent>

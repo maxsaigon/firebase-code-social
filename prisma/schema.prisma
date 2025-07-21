@@ -59,15 +59,19 @@ model User {
   avatarUrl     String?   @map("avatar_url")
   isAdmin       Boolean   @default(false) @map("is_admin")
   status        UserStatus @default(ACTIVE)
+  balance       Decimal   @default(0.00) @db.Decimal(15, 2) // User account balance
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  accounts      Account[]
-  sessions      Session[]
-  wallet        Wallet?
-  orders        Order[]
-  transactions  Transaction[]
+  accounts           Account[]
+  sessions           Session[]
+  wallet             Wallet?
+  orders             Order[]
+  transactions       Transaction[]
+  paymentMethods     PaymentMethod[]
+  paymentTransactions PaymentTransaction[]
+  cryptoAddresses    CryptoAddress[]
 
   @@map("users")
 }
@@ -189,4 +193,67 @@ enum TransactionStatus {
   CANCELLED
 
   @@map("transaction_status")
+}
+
+// Payment Settings model for admin configuration
+model PaymentSetting {
+  id        String   @id @default(cuid())
+  provider  String   @unique // 'stripe', 'bitcoin', 'ethereum', etc.
+  config    Json     // Store API keys, wallet addresses, etc.
+  isActive  Boolean  @default(false) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_settings")
+}
+
+// Payment Methods model for user payment methods
+model PaymentMethod {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  type      String   // 'stripe_card', 'bitcoin', 'ethereum', etc.
+  details   Json     // Store payment method details
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
+
+// Payment Transactions model for tracking all payments
+model PaymentTransaction {
+  id                    String   @id @default(cuid())
+  userId                String   @map("user_id")
+  amount                Decimal  @db.Decimal(10, 2)
+  currency              String   @default("USD")
+  provider              String
+  providerTransactionId String?  @map("provider_transaction_id")
+  status                String   @default("pending") // 'pending', 'completed', 'failed', 'cancelled', 'verifying', 'expired'
+  type                  String   // 'deposit', 'withdrawal'
+  expiresAt             DateTime? @map("expires_at") // Payment expiration time
+  processedAt           DateTime? @map("processed_at") // When payment was processed
+  metadata              Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payment_transactions")
+}
+
+// Crypto Addresses model for managing crypto payments
+model CryptoAddress {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  currency  String   // 'BTC', 'ETH', 'USDT', etc.
+  address   String
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, currency])
+  @@map("crypto_addresses")
 }

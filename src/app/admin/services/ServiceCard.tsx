@@ -1,6 +1,7 @@
 import React from 'react';
 import { Package, Edit, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Service } from '@/types';
 
 interface ServiceCardProps {
@@ -22,11 +23,7 @@ const ServiceCard = ({ service, onEdit, onDelete }: ServiceCardProps) => {
             <p className="text-sm text-gray-500">{service.category}</p>
           </div>
         </div>
-        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-          service.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-        }`}>
-          {service.is_active ? 'Active' : 'Inactive'}
-        </span>
+        <StatusBadge status={service.status} type="service" />
       </div>
       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{service.description || 'No description provided.'}</p>
       <div className="flex items-center justify-between">

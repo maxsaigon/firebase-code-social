@@ -4,11 +4,12 @@
 
 - Dashboard Overview: Centralized admin dashboard for managing users, services, orders, and transactions.
 - User Management: User management tools for adding, editing, and deleting user accounts, as well as viewing detailed user information.
-- Service Management: Service management module for creating, updating, and removing service listings.
-- Order Tracking: Order tracking system to monitor and manage orders.
-- Transaction Viewer: Transaction history viewer to track financial transactions related to orders and services.
-- Authentication: Authentication system allowing to only authorized users can access the admin panel.
+- Service Management: Service management module for creating, updating, and removing service listings with status control (ACTIVE/INACTIVE).
+- Order Tracking: Advanced order tracking system with status management and automatic refund capabilities.
+- Transaction Viewer: Comprehensive transaction history viewer including refund tracking and wallet management.
+- Authentication: Secure authentication system with role-based access control.
 - Service Description Optimizer: AI-powered tool that analyzes existing service descriptions and suggests improvements for clarity and appeal.
+- Status Management: Unified status badge system for consistent visual feedback across all entities.
 
 ## Style Guidelines:
 
@@ -37,14 +38,19 @@ This section outlines the current state of the Service Central project, detailin
   - User listing with search and status filtering.
   - Modals for adding and editing user details using `UserForm`.
   - Integration with `authApi.register` for new user creation (note: a known bug exists where new user registration might fail due to database constraints, which is being tracked for future resolution).
-- **Service Management (`/admin/services`)**: Implements full CRUD operations for service offerings. Features include:
-  - Service listing using `ServiceCard` components.
+- **Service Management (`/admin/services`)**: Implements full CRUD operations for service offerings with enhanced status management. Features include:
+  - Service listing using `ServiceCard` components with status badges.
+  - Status control (ACTIVE/INACTIVE) with visual indicators.
   - Modals for adding and editing service details using `ServiceForm`.
-- **Order Management (`/admin/orders`)**: Implements full CRUD operations for customer orders. Features include:
+- **Order Management (`/admin/orders`)**: Implements advanced order management with status tracking and refund capabilities. Features include:
   - Order listing with search and status filtering.
-  - Modals for adding and editing order details using `OrderForm`.
-- **Transaction Management (`/admin/transactions`)**: Implements full CRUD operations for financial transactions. Features include:
+  - Context-aware `OrderForm` with dynamic validation.
+  - Automatic refund system for cancelled orders.
+  - Order status editing with immediate wallet updates.
+- **Transaction Management (`/admin/transactions`)**: Enhanced transaction management including refund tracking. Features include:
   - Transaction listing with search, type, and status filtering.
+  - Automatic refund transaction creation.
+  - Wallet balance management integration.
   - Modals for adding and editing transaction details using `TransactionForm`.
 - **AI Tools (`/admin/ai-tools`)**: Integrates the `ServiceOptimizer` component, demonstrating an AI-powered tool for enhancing service descriptions.
 

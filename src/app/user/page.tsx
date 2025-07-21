@@ -72,6 +72,9 @@ export default function HomePage() {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500">Error loading services: {error.message}</div>;
 
+  // Filter to show only ACTIVE services
+  const activeServices = services?.filter(service => service.status === 'ACTIVE') || [];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -82,21 +85,28 @@ export default function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services?.map((service) => (
-          <div key={service.id} className="relative">
-            <UserServiceCard service={service} />
-            <div className="mt-4">
-              <Button 
-                onClick={() => handleOrderService(service)}
-                className="w-full"
-                disabled={!service.is_active}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                {service.is_active ? 'Order Now' : 'Unavailable'}
-              </Button>
-            </div>
+        {activeServices.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-500 text-lg">No active services available at the moment.</p>
+            <p className="text-gray-400 text-sm mt-2">Please check back later!</p>
           </div>
-        ))}
+        ) : (
+          activeServices.map((service) => (
+            <div key={service.id} className="relative">
+              <UserServiceCard service={service} />
+              <div className="mt-4">
+                <Button 
+                  onClick={() => handleOrderService(service)}
+                  className="w-full"
+                  disabled={service.status !== 'ACTIVE'}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  {service.status === 'ACTIVE' ? 'Order Now' : 'Unavailable'}
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {(!services || services.length === 0) && (
@@ -118,8 +128,10 @@ export default function HomePage() {
             <OrderForm
               serviceName={selectedService.name}
               unitPrice={selectedService.price}
+              serviceId={selectedService.id}
               onSubmit={handleCreateOrder}
               isSubmitting={createOrderMutation.isPending}
+              currentUserId={user?.id}
             />
           )}
         </DialogContent>

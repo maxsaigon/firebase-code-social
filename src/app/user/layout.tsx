@@ -22,6 +22,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     { label: 'Home', href: '/user' },
     { label: 'My Orders', href: '/user/my-orders' },
     { label: 'My Wallet', href: '/user/wallet' },
+    { label: 'Add Funds', href: '/user/add-funds' },
     { label: 'Order Service', href: '/user/order-service' },
   ];
 

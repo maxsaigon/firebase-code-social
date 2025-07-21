@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, Sparkles, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, Sparkles, CreditCard, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -65,6 +65,11 @@ const AdminSidebar = () => {
       icon: DollarSign,
       label: "Transactions",
       href: "/admin/transactions",
+    },
+    {
+      icon: CreditCard,
+      label: "Payment Settings",
+      href: "/admin/payment",
     },
     {
       icon: Sparkles,

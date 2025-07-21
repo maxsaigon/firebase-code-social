@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { User, CreateUserData } from '@/types';
 
 const userSchema = z.object({
-  full_name: z.string().min(2, 'Name must be at least 2 characters').optional().or(z.literal('')),
+  full_name: z.string().optional(),
   email: z.string().email('Invalid email address'),
-  status: z.enum(['active', 'inactive', 'suspended']).default('active'),
+  status: z.enum(['active', 'inactive', 'suspended']).optional(),
+  is_admin: z.boolean().optional(),
   password: z.string().min(6, 'Password must be at least 6 characters').optional(),
 });
 
@@ -23,12 +24,13 @@ interface UserFormProps {
 }
 
 export const UserForm = ({ user, onSubmit, isSubmitting, isCreating }: UserFormProps) => {
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<CreateUserData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreateUserData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
       full_name: user?.full_name || '',
       email: user?.email || '',
       status: user?.status || 'active',
+      is_admin: user?.is_admin || false,
     },
   });
 
@@ -37,6 +39,7 @@ export const UserForm = ({ user, onSubmit, isSubmitting, isCreating }: UserFormP
       setValue('full_name', user.full_name || '');
       setValue('email', user.email);
       setValue('status', user.status);
+      setValue('is_admin', user.is_admin);
     }
   }, [user, setValue]);
 
@@ -65,6 +68,19 @@ export const UserForm = ({ user, onSubmit, isSubmitting, isCreating }: UserFormP
           </SelectContent>
         </Select>
         {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
+      </div>
+      <div>
+        <Label htmlFor="is_admin">Admin Role</Label>
+        <Select onValueChange={(value) => setValue('is_admin', value === 'true')} defaultValue={user?.is_admin ? 'true' : 'false'}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="false">User</SelectItem>
+            <SelectItem value="true">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.is_admin && <p className="text-red-500 text-sm">{errors.is_admin.message}</p>}
       </div>
       {isCreating && (
         <div>

@@ -13,7 +13,7 @@ export async function GET() {
 
     try {
       const result = await client.query(
-        'SELECT * FROM services WHERE is_active = true ORDER BY created_at DESC'
+        'SELECT * FROM services ORDER BY created_at DESC'
       );
 
       console.log(`✅ Retrieved ${result.rows.length} services`);
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.log('=== Create Service API Started ===');
 
     const body = await request.json();
-    const { name, description, price, category, is_active = true } = body;
+    const { name, description, price, category, status = 'ACTIVE' } = body;
 
     if (!name || !description || !price || !category) {
       return NextResponse.json(
@@ -59,14 +59,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Normalize status to uppercase for enum
+    const normalizedStatus = status ? status.toUpperCase() : 'ACTIVE';
+
     const client = await pool.connect();
 
     try {
       const result = await client.query(
-        `INSERT INTO services (id, name, description, price, category, is_active, created_at, updated_at) 
+        `INSERT INTO services (id, name, description, price, category, status, created_at, updated_at) 
          VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW(), NOW()) 
          RETURNING *`,
-        [name, description, price, category, is_active]
+        [name, description, price, category, normalizedStatus]
       );
 
       console.log('✅ Service created successfully:', result.rows[0].name);

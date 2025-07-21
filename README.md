@@ -27,17 +27,27 @@ This project has been successfully migrated from Supabase to a self-hosted Postg
 
 ### Admin Dashboard
 - User management (CRUD operations)
-- Service management with categories
-- Order processing and status tracking
+- Service management with status control (ACTIVE/INACTIVE)
+- Order processing with advanced status tracking
+- Automatic refund system for cancelled orders
 - Transaction monitoring and reporting
 - Real-time dashboard statistics
+- StatusBadge component for consistent status display
 
 ### User Portal  
-- Service browsing and ordering
+- Service browsing with availability filtering
+- Context-aware order forms
 - Wallet management (deposits/withdrawals)
-- Order history and tracking
-- Transaction history
+- Order history and tracking with status updates
+- Transaction history with refund tracking
 - Profile management
+
+### Enhanced Order System
+- **Service Status Management**: ACTIVE/INACTIVE status with visual indicators
+- **Smart Order Forms**: Context-aware rendering for admin vs user interfaces
+- **Automatic Refunds**: Instant wallet credits for cancelled orders
+- **Status Tracking**: Comprehensive order status management
+- **Dynamic Validation**: Schema adapts based on user context
 
 ### Authentication System
 - Secure user registration with email verification

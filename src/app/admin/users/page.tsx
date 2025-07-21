@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, User, Edit, Trash } from 'lucide-react';
-import { useUsers, useUpdateUser, useDeleteUser } from '@/hooks/useUsers';
-import { authApi } from '@/api/authApi';
+import { Plus, User, Edit, Trash, Eye } from 'lucide-react';
+import Link from 'next/link';
+import { useUsers, useUpdateUser, useDeleteUser, useCreateUser } from '@/hooks/useUsers';
 import { useDebounce } from '@/hooks/useDebounce';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { StatusBadge } from '@/components/shared/StatusBadge';
 import DataTable from '@/components/shared/DataTable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -23,25 +24,23 @@ export default function UserManagementPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 
-  const { data: users, isLoading, error } = useUsers({
+  const { data: users, isLoading, error, refetch } = useUsers({
     search: debouncedSearch,
     status: statusFilter,
   });
 
-  
+  const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
   const deleteUserMutation = useDeleteUser();
 
   const handleCreateUser = async (data: CreateUserData) => {
-    if (!data.password) {
-      // This should ideally be caught by form validation, but as a safeguard
-      throw new Error("Password is required for new user creation.");
+    try {
+      await createUserMutation.mutateAsync(data);
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error('Error creating user:', error);
     }
-    await authApi.register(data);
-    setIsCreateModalOpen(false);
-  };
-
-  const handleUpdateUser = async (data: CreateUserData) => {
+  };  const handleUpdateUser = async (data: CreateUserData) => {
     if (selectedUser) {
       await updateUserMutation.mutateAsync({ id: selectedUser.id, updates: data });
       setIsEditModalOpen(false);
@@ -117,15 +116,7 @@ export default function UserManagementPage() {
             key: 'status',
             header: 'Status',
             render: (value) => (
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                value === 'active'
-                  ? 'bg-green-100 text-green-800'
-                  : value === 'inactive'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {value}
-              </span>
+              <StatusBadge status={value} type="user" />
             ),
           },
           {
@@ -138,6 +129,11 @@ export default function UserManagementPage() {
             header: 'Actions',
             render: (_, user) => (
               <div className="flex gap-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/admin/users/${user.id}`}>
+                    <Eye className="w-4 h-4" />
+                  </Link>
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"

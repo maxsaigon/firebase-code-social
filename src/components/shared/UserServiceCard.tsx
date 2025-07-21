@@ -20,9 +20,9 @@ const UserServiceCard = ({ service }: UserServiceCardProps) => {
           </div>
         </div>
         <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-          service.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          service.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
         }`}>
-          {service.is_active ? 'Available' : 'Unavailable'}
+          {service.status === 'ACTIVE' ? 'Available' : 'Unavailable'}
         </span>
       </div>
       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{service.description || 'No description provided.'}</p>

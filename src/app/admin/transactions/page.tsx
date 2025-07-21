@@ -5,6 +5,7 @@ import { Plus, DollarSign, Edit, Trash } from 'lucide-react';
 import { useTransactions, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions';
 import { useDebounce } from '@/hooks/useDebounce';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { StatusBadge } from '@/components/shared/StatusBadge';
 import DataTable from '@/components/shared/DataTable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -131,32 +132,14 @@ export default function TransactionManagementPage() {
             key: 'type',
             header: 'Type',
             render: (value) => (
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                value === 'deposit'
-                  ? 'bg-green-100 text-green-800'
-                  : value === 'payment'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {value}
-              </span>
+              <StatusBadge status={value} type="transaction" />
             ),
           },
           {
             key: 'status',
             header: 'Status',
             render: (value) => (
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                value === 'completed'
-                  ? 'bg-green-100 text-green-800'
-                  : value === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : value === 'failed'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {value}
-              </span>
+              <StatusBadge status={value} type="transaction" />
             ),
           },
           {

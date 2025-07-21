@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { CreateServiceData, Service } from '@/types';
 
@@ -16,7 +16,7 @@ const serviceSchema = z.object({
     (val) => Number(val),
     z.number().min(0, 'Price must be a positive number')
   ),
-  is_active: z.boolean().default(true),
+  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
   category: z.string().optional(),
 });
 
@@ -27,10 +27,12 @@ interface ServiceFormProps {
 }
 
 export const ServiceForm = ({ service, onSubmit, isSubmitting }: ServiceFormProps) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateServiceData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateServiceData>({
     resolver: zodResolver(serviceSchema),
-    defaultValues: service || { name: '', description: '', price: 0, is_active: true, category: 'general' },
+    defaultValues: service || { name: '', description: '', price: 0, status: 'ACTIVE', category: 'general' },
   });
+
+  const watchedStatus = watch('status');
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -54,9 +56,21 @@ export const ServiceForm = ({ service, onSubmit, isSubmitting }: ServiceFormProp
         <Input id="category" {...register('category')} />
         {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
       </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="is_active" {...register('is_active')} />
-        <Label htmlFor="is_active">Active</Label>
+      <div>
+        <Label htmlFor="status">Status</Label>
+        <Select 
+          value={watchedStatus} 
+          onValueChange={(value) => setValue('status', value as 'ACTIVE' | 'INACTIVE')}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ACTIVE">Active</SelectItem>
+            <SelectItem value="INACTIVE">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>

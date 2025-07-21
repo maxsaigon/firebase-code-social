@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
 
       // Get service details and price
       const serviceResult = await client.query(
-        'SELECT * FROM services WHERE id = $1 AND is_active = true',
-        [service_id]
+        'SELECT * FROM services WHERE id = $1 AND status = $2',
+        [service_id, 'ACTIVE']
       );
 
       if (serviceResult.rows.length === 0) {
