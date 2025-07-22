@@ -1,0 +1,766 @@
+# UI De---
+
+## 1. General Design Principles
+
+### 1.1. Design System - "Simple is the Best"
+- **Minimalist Interface**: Clean interface focused on core functionality
+- **Consistent Color Palette**: Use consistent color scheme
+- **Typography**: Clear and readable font system
+- **Responsive Design**: Mobile-first approachmentation
+
+## User Interface Design Documentation for Social Service Hub
+
+### Purpose
+This document provides detailed descriptions of each page, UI components, and design guidelines for the Social Service Hub project. It helps AI understand and automatically design appropriate user interfaces.
+
+---
+
+## 1. Nguyên tắc thiết kế chung
+
+### 1.1. Design System - "Simple is the Best"
+- **Minimalist Interface**: Giao diện sạch sẽ, tập trung vào chức năng chính
+- **Consistent Color Palette**: Sử dụng màu sắc nhất quán
+- **Typography**: Font system rõ ràng, dễ đọc
+- **Responsive Design**: Mobile-first approach
+
+### 1.2. Color Scheme
+```css
+/* Primary Colors */
+--primary: 222.2 84% 4.9%;          /* Almost black */
+--primary-foreground: 210 40% 98%;  /* Almost white */
+
+/* Secondary Colors */  
+--secondary: 210 40% 96%;           /* Light gray */
+--secondary-foreground: 222.2 84% 4.9%;
+
+/* Status Colors */
+--success: 142 76% 36%;             /* Green */
+--warning: 38 92% 50%;              /* Yellow */
+--destructive: 0 84% 60%;           /* Red */
+
+/* Background */
+--background: 0 0% 100%;            /* Pure white */
+--foreground: 222.2 84% 4.9%;       /* Dark text */
+```
+
+### 1.3. Component Library
+- **Base**: Shadcn/ui with Radix UI primitives
+- **Icons**: Lucide React
+- **Styling**: Tailwind CSS
+
+---
+
+## 2. Layout Structure
+
+### 2.1. Root Layout (`/src/app/layout.tsx`)
+```tsx
+- Global Providers (Auth, Query Client, Toast)
+- Font configuration (Inter)
+- Metadata configuration
+- Base HTML structure
+```
+
+**Design Requirements:**
+- Clean base layout
+- Global notification system
+- Proper font loading
+- Responsive meta tags
+
+### 2.2. Admin Layout (`/src/app/admin/layout.tsx`)
+```tsx
+- ProtectedRoute wrapper (requireAdmin: true)
+- Sidebar navigation (AdminSidebar)
+- Main content area
+- Header with user info
+```
+
+**Design Requirements:**
+- Fixed sidebar on desktop (width: 256px)
+- Collapsible mobile menu
+- Header with breadcrumbs and user avatar
+- Main content padding: 32px
+
+### 2.3. User Layout (`/src/app/user/layout.tsx`)
+```tsx
+- ProtectedRoute wrapper
+- User navigation header
+- Main content area
+- Footer (optional)
+```
+
+**Design Requirements:**
+- Top navigation bar
+- User avatar and wallet balance
+- Mobile-friendly navigation
+- Clean content area
+
+---
+
+## 3. Authentication Pages
+
+### 3.1. Login Page (`/src/app/auth/login/page.tsx`)
+
+**Purpose**: User authentication entry point
+
+**Layout Structure:**
+```
+┌─────────────────────────┐
+│      CENTERED CARD      │
+│  ┌─────────────────┐   │
+│  │     LOGO        │   │
+│  │   "Social Hub"  │   │
+│  │                 │   │
+│  │ Email Input     │   │
+│  │ Password Input  │   │
+│  │ [Login Button]  │   │
+│  │                 │   │
+│  │ Register Link   │   │
+│  └─────────────────┘   │
+└─────────────────────────┘
+```
+
+**Design Specifications:**
+- Center card: max-width 400px
+- Card shadow: subtle drop shadow
+- Input fields: rounded borders, focus states
+- Button: primary color, full width
+- Typography: heading (2xl), body (sm)
+
+**Components Used:**
+- Card, Input, Button, Label
+- Link to register page
+
+### 3.2. Register Page (`/src/app/auth/register/page.tsx`)
+
+**Layout Structure:**
+```
+┌─────────────────────────┐
+│      CENTERED CARD      │
+│  ┌─────────────────┐   │
+│  │   REGISTRATION  │   │
+│  │                 │   │
+│  │ Full Name       │   │
+│  │ Email Input     │   │
+│  │ Password Input  │   │
+│  │ Confirm Pass    │   │
+│  │ [Register Btn]  │   │
+│  │                 │   │
+│  │ Login Link      │   │
+│  └─────────────────┘   │
+└─────────────────────────┘
+```
+
+---
+
+## 4. Admin Dashboard Pages
+
+### 4.1. Dashboard Overview (`/src/app/admin/dashboard/page.tsx`)
+
+**Purpose**: Admin analytics and overview
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ Dashboard | Overview of service hub │
+├─────────────────────────────────────┤
+│ STATS GRID (4 columns on desktop)  │
+│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐    │
+│ │Users│ │Srvcs│ │Orders│ │Rev │    │
+│ │ 👥  │ │ 📦  │ │ ⏰   │ │ 💰 │    │
+│ │ 1.2k│ │  45 │ │  12  │ │$10k│    │
+│ └─────┘ └─────┘ └─────┘ └─────┘    │
+├─────────────────────────────────────┤
+│ CONTENT GRID (2 columns)           │
+│ ┌─────────────────┐ ┌─────────────┐ │
+│ │ Recent Orders   │ │Recent Users │ │
+│ │ ┌─────────────┐ │ │ ┌─────────┐ │ │
+│ │ │ Order List  │ │ │ │User List│ │ │
+│ │ └─────────────┘ │ │ └─────────┘ │ │
+│ └─────────────────┘ └─────────────┘ │
+└─────────────────────────────────────┘
+```
+
+**Components:**
+- DashboardCard: Stats with icons, numbers, trends
+- RecentOrders: Table with order info
+- RecentUsers: List with user avatars
+- Grid layout: responsive (1 col mobile, 4 col desktop)
+
+**Data Displayed:**
+- New Users (30 days)
+- Active Services 
+- Pending Orders
+- Total Revenue
+
+### 4.2. User Management (`/src/app/admin/users/page.tsx`)
+
+**Purpose**: CRUD operations for users
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER WITH ACTIONS                 │
+│ Users | [+ Create User]             │
+├─────────────────────────────────────┤
+│ FILTERS BAR                         │
+│ [Search Input] [Status Filter] [🔍] │
+├─────────────────────────────────────┤
+│ DATA TABLE                          │
+│ ┌─────┬─────┬─────┬─────┬─────────┐ │
+│ │Avatar│Name │Email│Status│Actions│ │
+│ ├─────┼─────┼─────┼─────┼─────────┤ │
+│ │ 👤  │John │j@.. │●ACTV│👁✏️🗑️ │ │
+│ │ 👤  │Jane │jane │●ACTV│👁✏️🗑️ │ │
+│ └─────┴─────┴─────┴─────┴─────────┘ │
+├─────────────────────────────────────┤
+│ PAGINATION                          │
+│           [< Prev] [1][2][3] [Next >]│
+└─────────────────────────────────────┘
+```
+
+**Features:**
+- Search by name/email
+- Filter by status (Active/Inactive)
+- View, Edit, Delete actions
+- Create new user modal
+- Status badges with colors
+
+**Components:**
+- DataTable with sorting
+- StatusBadge component
+- Modal dialogs (Create/Edit)
+- Confirmation dialogs
+
+### 4.3. Service Management (`/src/app/admin/services/page.tsx`)
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ Services | [+ Create Service]       │
+├─────────────────────────────────────┤
+│ FILTERS                             │
+│ [Search] [Category] [Status]        │
+├─────────────────────────────────────┤
+│ SERVICE CARDS GRID                  │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│ │Service 1│ │Service 2│ │Service 3│ │
+│ │$99      │ │$149     │ │$79      │ │
+│ │●Active  │ │●Active  │ │○Inactive│ │
+│ │[Edit]   │ │[Edit]   │ │[Edit]   │ │
+│ └─────────┘ └─────────┘ └─────────┘ │
+└─────────────────────────────────────┘
+```
+
+**Service Card Design:**
+- Service name (heading)
+- Description (truncated)
+- Price (prominent)
+- Category badge
+- Status indicator
+- Action buttons
+
+### 4.4. Order Management (`/src/app/admin/orders/page.tsx`)
+
+**Layout**: Similar to user management but with order-specific data
+
+**Columns:**
+- Order ID
+- Customer
+- Service
+- Amount
+- Status
+- Created Date
+- Actions
+
+**Status Types:**
+- PENDING (yellow)
+- PROCESSING (blue) 
+- COMPLETED (green)
+- CANCELLED (red)
+
+### 4.5. Transaction Management (`/src/app/admin/transactions/page.tsx`)
+
+**Purpose**: Financial transaction overview
+
+**Columns:**
+- Transaction ID
+- User
+- Type (DEPOSIT, PAYMENT, REFUND)
+- Amount
+- Status
+- Date
+- Actions
+
+### 4.6. Payment Settings (`/src/app/admin/payment/page.tsx`)
+
+**Purpose**: Configure payment providers
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ Payment Settings                    │
+├─────────────────────────────────────┤
+│ TABS                                │
+│ [Stripe] [Cryptocurrency]           │
+├─────────────────────────────────────┤
+│ STRIPE SETTINGS                     │
+│ ┌─────────────────────────────────┐ │
+│ │ Publishable Key    [input]      │ │
+│ │ Secret Key        [input]       │ │
+│ │ Webhook Secret    [input]       │ │
+│ │ ☐ Enable Stripe               │ │
+│ │                               │ │
+│ │           [Save Settings]      │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+**Security Note**: Mask sensitive keys in UI
+
+### 4.7. AI Tools (`/src/app/admin/ai-tools/page.tsx`)
+
+**Purpose**: AI-powered service optimization
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ AI Tools | Service Optimization     │
+├─────────────────────────────────────┤
+│ SERVICE OPTIMIZER                   │
+│ ┌─────────────────────────────────┐ │
+│ │ Service Description             │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ [Large textarea input]      │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ │                               │ │
+│ │        [Optimize with AI]      │ │
+│ │                               │ │
+│ │ Optimized Result              │ │
+│ │ ┌─────────────────────────────┐ │ │
+│ │ │ [Output area]              │ │ │
+│ │ └─────────────────────────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### 4.8. User Detail Page (`/src/app/admin/users/[id]/page.tsx`)
+
+**Purpose**: Detailed user profile and management
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER WITH BACK BUTTON             │
+│ [← Back] User Details - John Doe    │
+├─────────────────────────────────────┤
+│ USER INFO SECTION                   │
+│ ┌─────────────────────────────────┐ │
+│ │ 👤 Profile Info                │ │
+│ │ Name: John Doe                  │ │
+│ │ Email: john@example.com         │ │
+│ │ Status: ●Active                 │ │
+│ │ Wallet: $150.50                 │ │
+│ │ Joined: Jan 15, 2024            │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│ TABS SECTION                        │
+│ [Orders] [Transactions] [Stats]     │
+├─────────────────────────────────────┤
+│ TAB CONTENT                         │
+│ [Order history table/stats charts]  │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 5. User Portal Pages
+
+### 5.1. Service Browser (`/src/app/user/page.tsx`)
+
+**Purpose**: Browse and order services
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ Available Services                  │
+├─────────────────────────────────────┤
+│ FILTERS                             │
+│ [Search] [Category] [Price Range]   │
+├─────────────────────────────────────┤
+│ SERVICE CARDS GRID (3 columns)     │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│ │🎨Design │ │💻Develop│ │📱Social │ │
+│ │Logo     │ │Website  │ │Followers│ │
+│ │$99.99   │ │$299.99  │ │$19.99   │ │
+│ │[Order]  │ │[Order]  │ │[Order]  │ │
+│ └─────────┘ └─────────┘ └─────────┘ │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│ │📝Content│ │🔍SEO    │ │📺Video  │ │
+│ │Writing  │ │Package  │ │Editing  │ │
+│ │$49.99   │ │$79.99   │ │$89.99   │ │
+│ │[Order]  │ │[Order]  │ │[Order]  │ │
+│ └─────────┘ └─────────┘ └─────────┘ │
+└─────────────────────────────────────┘
+```
+
+**Service Card Design:**
+- Category icon
+- Service name
+- Brief description
+- Price (prominent)
+- Order button (primary)
+- Hover effects
+
+### 5.2. My Orders (`/src/app/user/my-orders/page.tsx`)
+
+**Purpose**: User's order history
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ My Orders                           │
+├─────────────────────────────────────┤
+│ FILTER TABS                         │
+│ [All] [Pending] [Processing] [Done] │
+├─────────────────────────────────────┤
+│ ORDER CARDS LIST                    │
+│ ┌─────────────────────────────────┐ │
+│ │ Order #12345                    │ │
+│ │ Logo Design Service             │ │
+│ │ Amount: $99.99                  │ │
+│ │ Status: 🟡 Processing           │ │
+│ │ Date: Jan 15, 2024              │ │
+│ │                    [View Details]│ │
+│ └─────────────────────────────────┘ │
+│ ┌─────────────────────────────────┐ │
+│ │ Order #12344                    │ │
+│ │ SEO Package                     │ │
+│ │ Amount: $79.99                  │ │
+│ │ Status: ✅ Completed           │ │
+│ │ Date: Jan 10, 2024              │ │
+│ │                    [View Details]│ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### 5.3. Wallet Management (`/src/app/user/wallet/page.tsx`)
+
+**Purpose**: Wallet balance and transactions
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ WALLET OVERVIEW                     │
+│ ┌─────────────────────────────────┐ │
+│ │ 💰 Current Balance              │ │
+│ │    $150.50                      │ │
+│ │                                 │ │
+│ │ [Add Funds] [Request Refund]    │ │
+│ └─────────────────────────────────┘ │
+├─────────────────────────────────────┤
+│ TRANSACTION HISTORY                 │
+│ ┌─────────────────────────────────┐ │
+│ │ ┌─┬─────────┬─────────┬────────┐ │ │
+│ │ │📅│Date    │Type     │Amount  │ │ │
+│ │ ├─┼─────────┼─────────┼────────┤ │ │
+│ │ │ │Jan 15   │Payment  │-$99.99 │ │ │
+│ │ │ │Jan 10   │Deposit  │+$200   │ │ │
+│ │ │ │Jan 05   │Refund   │+$49.99 │ │ │
+│ │ └─┴─────────┴─────────┴────────┘ │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### 5.4. Add Funds (`/src/app/user/add-funds/page.tsx`)
+
+**Purpose**: Deposit money via Stripe or crypto
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────┐
+│ HEADER                              │
+│ Add Funds to Wallet                 │
+├─────────────────────────────────────┤
+│ PAYMENT METHOD TABS                 │
+│ [💳 Credit Card] [₿ Cryptocurrency] │
+├─────────────────────────────────────┤
+│ STRIPE PAYMENT FORM                 │
+│ ┌─────────────────────────────────┐ │
+│ │ Amount                          │ │
+│ │ [$____] USD                     │ │
+│ │                                 │ │
+│ │ Card Information                │ │
+│ │ [Stripe Elements Card Input]    │ │
+│ │                                 │ │
+│ │        [Add Funds - $X.XX]      │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+**Crypto Tab:**
+```
+┌─────────────────────────────────────┐
+│ CRYPTO PAYMENT                      │
+│ ┌─────────────────────────────────┐ │
+│ │ Select Cryptocurrency           │ │
+│ │ [Bitcoin ▼] [Ethereum ▼]        │ │
+│ │                                 │ │
+│ │ Amount: $50.00                  │ │
+│ │ ≈ 0.0012 BTC                    │ │
+│ │                                 │ │
+│ │ Payment Address                 │ │
+│ │ [QR Code]                       │ │
+│ │ bc1qxy2kgdygjrsqtzq2n0yrf2493...│ │
+│ │                                 │ │
+│ │ [Copy Address] [New Address]    │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+
+### 5.5. Transactions (`/src/app/user/transactions/page.tsx`)
+
+**Purpose**: Transaction history for user
+
+**Layout**: Similar to wallet but more detailed filtering
+
+### 5.6. Order Service (`/src/app/user/order-service/page.tsx`)
+
+**Purpose**: Direct service ordering with service ID
+
+---
+
+## 6. Shared Components
+
+### 6.1. AdminSidebar
+**Location**: `/src/components/shared/AdminSidebar.tsx`
+
+**Structure:**
+```
+┌─────────────────┐
+│ LOGO            │
+│ Service Hub     │
+├─────────────────┤
+│ NAVIGATION      │
+│ 📊 Dashboard    │
+│ 👥 Users        │
+│ 📦 Services     │
+│ 📋 Orders       │
+│ 💰 Transactions │
+│ 💳 Payments     │
+│ 🤖 AI Tools     │
+├─────────────────┤
+│ USER PROFILE    │
+│ 👤 Admin Name   │
+│ [Logout]        │
+└─────────────────┘
+```
+
+### 6.2. Header Component
+**Purpose**: Page headers with breadcrumbs
+
+**Structure:**
+```
+Title | Subtitle
+Optional breadcrumb navigation
+Action buttons (right aligned)
+```
+
+### 6.3. DataTable
+**Purpose**: Reusable table with sorting, pagination
+
+**Features:**
+- Column sorting
+- Search functionality  
+- Pagination
+- Loading states
+- Empty states
+
+### 6.4. StatusBadge
+**Purpose**: Consistent status indicators
+
+**Types:**
+- SUCCESS: Green (Active, Completed)
+- WARNING: Yellow (Pending, Processing)  
+- DESTRUCTIVE: Red (Inactive, Cancelled)
+- SECONDARY: Gray (default)
+
+### 6.5. DashboardCard
+**Purpose**: Stat cards for dashboard
+
+**Structure:**
+```
+┌─────────────────┐
+│ 👥 ICON         │
+│ 1,234           │
+│ New Users       │
+│ ↗️ +12% (trend) │
+└─────────────────┘
+```
+
+### 6.6. LoadingSpinner
+**Purpose**: Loading indicators
+
+**Types:**
+- Page loading (full screen)
+- Component loading (inline)
+- Button loading (inside buttons)
+
+### 6.7. Modal Dialogs
+**Purpose**: Create/Edit forms
+
+**Structure:**
+- Dialog header with title
+- Form content area
+- Action buttons (Cancel, Save)
+
+---
+
+## 7. Form Components
+
+### 7.1. UserForm
+**Purpose**: Create/Edit user information
+
+**Fields:**
+- Full Name (required)
+- Email (required)
+- Password (required for create)
+- Admin checkbox
+- Status select
+
+### 7.2. ServiceForm  
+**Purpose**: Create/Edit services
+
+**Fields:**
+- Service name
+- Description (textarea)
+- Price (number)
+- Category (select)
+- Status (active/inactive)
+
+### 7.3. OrderForm
+**Purpose**: Create orders
+
+**Admin Context:**
+- User selection dropdown
+- Service selection dropdown
+- Quantity
+- Custom price override
+
+**User Context:**
+- Service name (read-only)
+- Quantity
+- Price display
+
+### 7.4. TransactionForm
+**Purpose**: Manual transaction entry (admin)
+
+---
+
+## 8. Responsive Design Guidelines
+
+### 8.1. Breakpoints
+```css
+sm: 640px   /* Mobile large */
+md: 768px   /* Tablet */
+lg: 1024px  /* Desktop */
+xl: 1280px  /* Desktop large */
+```
+
+### 8.2. Mobile Adaptations
+
+**Sidebar Navigation:**
+- Desktop: Fixed sidebar (256px width)
+- Mobile: Overlay menu with hamburger button
+
+**Data Tables:**
+- Desktop: Full table view
+- Mobile: Card-based layout with key information
+
+**Grid Layouts:**
+- Desktop: Multi-column grids
+- Mobile: Single column stacks
+
+**Forms:**
+- Desktop: Side-by-side fields
+- Mobile: Stacked fields with full width
+
+### 8.3. Touch Interactions
+- Minimum touch target: 44px
+- Adequate spacing between interactive elements
+- Swipe gestures for navigation (where appropriate)
+
+---
+
+## 9. Animation and Transitions
+
+### 9.1. Standard Transitions
+```css
+transition-all: 150ms ease-in-out;
+hover:shadow-md: Subtle shadow on hover
+focus:ring-2: Focus indicators
+```
+
+### 9.2. Loading States
+- Skeleton loading for tables
+- Spinner for buttons
+- Progressive loading for images
+
+### 9.3. Page Transitions
+- Smooth navigation between pages
+- Modal slide-in animations
+- Toast notifications
+
+---
+
+## 10. Error States and Empty States
+
+### 10.1. Error Handling
+- Toast notifications for user feedback
+- Inline form validation
+- API error messages
+- 404 and error pages
+
+### 10.2. Empty States
+- Empty tables with call-to-action
+- No search results messaging
+- Onboarding guidance for new users
+
+---
+
+## 11. Accessibility Guidelines
+
+### 11.1. WCAG Compliance
+- Color contrast ratios
+- Keyboard navigation
+- Screen reader support
+- Focus management
+
+### 11.2. Semantic HTML
+- Proper heading hierarchy
+- ARIA labels and roles
+- Form label associations
+- Alt text for images
+
+---
+
+## 12. Performance Considerations
+
+### 12.1. Image Optimization
+- Next.js Image component
+- Proper sizing and formats
+- Lazy loading
+
+### 12.2. Code Splitting
+- Route-based code splitting
+- Component lazy loading
+- Bundle optimization
+
+---
+
+This document provides comprehensive information about the UI design of the project so that AI can understand and create interfaces that are compatible with the current system.
